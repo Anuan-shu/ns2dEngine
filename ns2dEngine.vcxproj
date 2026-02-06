@@ -387,6 +387,7 @@
     <ClInclude Include="libs\lua\luaconf.h" />
     <ClInclude Include="libs\lua\lualib.h" />
     <ClInclude Include="libs\sol\sol.hpp" />
+    <ClInclude Include="src\Game.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl" />
@@ -530,6 +531,7 @@
     <ClCompile Include="libs\imgui\imgui_draw.cpp" />
     <ClCompile Include="libs\imgui\imgui_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

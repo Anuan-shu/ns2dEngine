@@ -783,6 +783,15 @@
     <ClInclude Include="src\Logger\Logger.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Components\TransformComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\MovementSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\ECS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">
@@ -1209,6 +1218,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\Logger\Logger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ECS\ECS.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

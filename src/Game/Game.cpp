@@ -1,17 +1,19 @@
 #include"Game.h"
+#include"../Logger/Logger.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
 #include<iostream>
 Game::Game() {
 	isRunning = false;
+	Logger::Log("Game constructor called");
 }
 Game::~Game() {
-
+	Logger::Err("Game destructor called");
 }
 void Game::Initialize() {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		std::cerr << "Error initializing SDL" << std::endl;
+		Logger::Err("Error initializing SDL");
 		return;
 	}
 	// 获取显示器相关
@@ -29,12 +31,12 @@ void Game::Initialize() {
 		SDL_WINDOW_BORDERLESS
 	);
 	if (!window) {
-		std::cerr << "Error creating SDL window" << std::endl;
+		Logger::Err("Error creating SDL window");
 		return;
 	}
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer) {
-		std::cerr << "Error creating SDL renderer" << std::endl;
+		Logger::Err("Error creating SDL window");
 		return;
 	}
 

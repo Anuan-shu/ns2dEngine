@@ -7,6 +7,7 @@
 #include<iostream>
 Game::Game() {
 	isRunning = false;
+	registry = new Registry();
 	Logger::Log("Game constructor called");
 }
 Game::~Game() {
@@ -42,7 +43,7 @@ void Game::Initialize() {
 	}
 
 	// 全屏模式
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	isRunning = true;
 }
@@ -65,7 +66,8 @@ void Game::ProcessInput() {
 void Game::Setup() {
 	// TODO:
 	// 注册实体，添加组件
-	// Entity tank = registry.CreateEntity();
+	Entity tank = registry->CreateEntity();
+	Entity truck = registry->CreateEntity();
 	// tank.AddComponent<TransformComponent>();
 
 }

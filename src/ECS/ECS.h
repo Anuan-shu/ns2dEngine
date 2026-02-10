@@ -16,6 +16,7 @@ protected:
 };
 template <typename T>
 class  Component :public IComponent {
+public:
 	static int GetId() {
 		static auto id = nextId++;
 		return id;
@@ -120,7 +121,7 @@ private:
 	std::unordered_map<std::type_index, System*>systems;
 
 	// 帧结束前统一创建销毁实体
-	std::set<Entity>entitiesToBeAdd;
+	std::set<Entity>entitiesToBeAdded;
 	std::set<Entity>entitiesToBeKilled;
 
 public:
@@ -129,7 +130,7 @@ public:
 	void Update();
 
 	// 实体
-	Entity CreateEntitty();
+	Entity CreateEntity();
 
 	// 组件
 	template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
@@ -143,7 +144,7 @@ public:
 	template <typename TSystem> TSystem& GetSystem()const;
 
 	// 检查实体组件签名，加入符合系统要求的系统中
-	void AddEntityToSystem(Entity entity);
+	void AddEntityToSystems(Entity entity);
 
 };
 
@@ -174,7 +175,10 @@ bool Registry::HasSystem()const {
 template <typename TSystem>
 TSystem& Registry::GetSystem()const {
 	auto system = systems.find(std::type_index(typeid(TSystem)));
-	return *(std::static_pointer_cast<TSystem>(system->second));
+
+	assert(system != systems.end() && "尝试获取未注册的系统！");
+
+	return *(static_cast<TSystem*>(system->second));
 }
 
 

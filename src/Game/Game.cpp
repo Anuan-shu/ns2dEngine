@@ -3,7 +3,9 @@
 #include"../ECS/ECS.h"
 #include"../Components/TransformComponent.h"
 #include"../Components/RigidBodyComponent.h"
+#include"../Components/SpriteComponent.h"
 #include"../Systems/MovementSystem.h"
+#include"../Systems/RenderSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -69,19 +71,28 @@ void Game::ProcessInput() {
 void Game::Setup() {
 	// 给游戏添加系统
 	registry->AddSystem<MovementSystem>();
+	registry->AddSystem<RenderSystem>();
 
 	// TODO:
 	// 注册实体，添加组件
 	Entity tank = registry->CreateEntity();
-	Entity truck = registry->CreateEntity();
 
 	// 添加组件
 	// registry->AddComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
 	// registry->AddComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
 	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
+	tank.AddComponent<SpriteComponent>(10, 10);
+
 
 	// tank.RemoveComponent<TransformComponent>();
+
+	Entity truck = registry->CreateEntity();
+
+	// 添加组件
+	truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
+	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
+	truck.AddComponent<SpriteComponent>(10, 50);
 }
 void Game::Update() {
 	// 固定帧率上限
@@ -110,6 +121,7 @@ void Game::Render() {
 	SDL_RenderClear(renderer);
 
 	// TODO: 渲染逻辑
+	registry->GetSystem<RenderSystem>().Update(renderer);
 
 	// 前后缓冲区交换
 	SDL_RenderPresent(renderer);

@@ -20,10 +20,10 @@ public:
 			transform.position.x += rigidbody.velocity.x * deltaTime;
 			transform.position.y += rigidbody.velocity.y * deltaTime;
 
-			Logger::Log("Entity id = " + std::to_string(entity.GetId()) +
+			/*Logger::Log("Entity id = " + std::to_string(entity.GetId()) +
 				" position (" +
 				std::to_string(transform.position.x) + ", " +
-				std::to_string(transform.position.y) + ")");
+				std::to_string(transform.position.y) + ")");*/
 		}
 	}
 };

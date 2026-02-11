@@ -792,6 +792,9 @@
     <ClInclude Include="src\ECS\ECS.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Components\RigidBodyComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">

@@ -1,6 +1,8 @@
 #include"Game.h"
 #include"../Logger/Logger.h"
 #include"../ECS/ECS.h"
+#include"../Components/TransformComponent.h"
+#include"../Components/RigidBodyComponent.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -68,8 +70,14 @@ void Game::Setup() {
 	// 注册实体，添加组件
 	Entity tank = registry->CreateEntity();
 	Entity truck = registry->CreateEntity();
-	// tank.AddComponent<TransformComponent>();
 
+	// 添加组件
+	// registry->AddComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+	// registry->AddComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
+	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+
+	tank.RemoveComponent<TransformComponent>();
 }
 void Game::Update() {
 	// 固定帧率上限

@@ -3,6 +3,7 @@
 #include"../ECS/ECS.h"
 #include"../Components/TransformComponent.h"
 #include"../Components/RigidBodyComponent.h"
+#include"../Systems/MovementSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -66,6 +67,9 @@ void Game::ProcessInput() {
 
 }
 void Game::Setup() {
+	// 给游戏添加系统
+	registry->AddSystem<MovementSystem>();
+
 	// TODO:
 	// 注册实体，添加组件
 	Entity tank = registry->CreateEntity();
@@ -77,7 +81,7 @@ void Game::Setup() {
 	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
 
-	tank.RemoveComponent<TransformComponent>();
+	// tank.RemoveComponent<TransformComponent>();
 }
 void Game::Update() {
 	// 固定帧率上限
@@ -95,6 +99,11 @@ void Game::Update() {
 	//MovementSystem.Update();
 	//CollisionSystem.Update();
 
+	// 更新系统
+	registry->GetSystem<MovementSystem>().Update(deltaTime);
+
+	// 更新注册表 待创建/销毁实体同步
+	registry->Update();
 }
 void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);

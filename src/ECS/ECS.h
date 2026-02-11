@@ -194,8 +194,6 @@ template <typename TSystem>
 TSystem& Registry::GetSystem()const {
 	auto system = systems.find(std::type_index(typeid(TSystem)));
 
-	assert(system != systems.end() && "尝试获取未注册的系统！");
-
 	return *(std::static_pointer_cast<TSystem>(system->second));
 }
 

@@ -13,6 +13,7 @@
 Game::Game() {
 	isRunning = false;
 	registry = std::make_unique<Registry>();
+	assetStore = std::make_unique<AssetStore>();
 	Logger::Log("Game constructor called");
 }
 Game::~Game() {
@@ -48,7 +49,7 @@ void Game::Initialize() {
 	}
 
 	// 全屏模式
-	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	// SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	isRunning = true;
 }
@@ -73,6 +74,10 @@ void Game::Setup() {
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
 
+	// 资产管理器添加纹理
+	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
+	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+
 	// TODO:
 	// 注册实体，添加组件
 	Entity tank = registry->CreateEntity();
@@ -80,9 +85,9 @@ void Game::Setup() {
 	// 添加组件
 	// registry->AddComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
 	// registry->AddComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
-	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(0.0, 0.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
-	tank.AddComponent<SpriteComponent>(10, 10);
+	tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
 
 
 	// tank.RemoveComponent<TransformComponent>();
@@ -92,7 +97,7 @@ void Game::Setup() {
 	// 添加组件
 	truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
-	truck.AddComponent<SpriteComponent>(10, 50);
+	truck.AddComponent<SpriteComponent>("truck-image", 32, 32);
 }
 void Game::Update() {
 	// 固定帧率上限
@@ -121,7 +126,7 @@ void Game::Render() {
 	SDL_RenderClear(renderer);
 
 	// TODO: 渲染逻辑
-	registry->GetSystem<RenderSystem>().Update(renderer);
+	registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
 
 	// 前后缓冲区交换
 	SDL_RenderPresent(renderer);

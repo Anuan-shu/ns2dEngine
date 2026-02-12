@@ -2,6 +2,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include"../ECS/ECS.h"
+#include"../AssetStore/AssetStore.h"
 #include<memory>
 #include<SDL.h>
 const int FPS = 60;
@@ -15,6 +16,8 @@ private:
 	int millisecsPreviousFrame = 0;
 
 	std::unique_ptr<Registry> registry;
+	std::unique_ptr<AssetStore>assetStore;
+
 public:
 	Game();
 	~Game();

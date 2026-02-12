@@ -801,6 +801,9 @@
     <ClInclude Include="src\Systems\RenderSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\AssetStore\AssetStore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">
@@ -1230,6 +1233,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\ECS\ECS.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetStore\AssetStore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

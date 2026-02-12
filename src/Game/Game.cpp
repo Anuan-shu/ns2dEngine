@@ -4,10 +4,11 @@
 #include"../Components/TransformComponent.h"
 #include"../Components/RigidBodyComponent.h"
 #include"../Components/SpriteComponent.h"
+#include"../Components/AnimationComponent.h"
+#include"../Components/BoxColliderComponent.h"
 #include"../Systems/MovementSystem.h"
 #include"../Systems/RenderSystem.h"
 #include"../Systems/AnimationSystem.h"
-#include"../Components/AnimationComponent.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -114,18 +115,20 @@ void Game::LoadLevel(int level) {
 	Entity tank = registry->CreateEntity();
 
 	// 添加组件
-	tank.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
+	tank.AddComponent<TransformComponent>(glm::vec2(100.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
+	tank.AddComponent<BoxColliderComponent>(32, 32);
 
 	// tank.RemoveComponent<TransformComponent>();
 
 	Entity truck = registry->CreateEntity();
 
 	// 添加组件
-	truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	truck.AddComponent<TransformComponent>(glm::vec2(100.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
 	truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 2);
+	truck.AddComponent<BoxColliderComponent>(32, 32);
 
 	Entity chopper = registry->CreateEntity();
 	chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);

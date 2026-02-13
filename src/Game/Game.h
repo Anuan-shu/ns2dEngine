@@ -3,6 +3,7 @@
 #define GAME_H
 #include"../ECS/ECS.h"
 #include"../AssetStore/AssetStore.h"
+#include"../EventBus/EventBus.h"
 #include<memory>
 #include<SDL.h>
 const int FPS = 60;
@@ -18,6 +19,7 @@ private:
 
 	std::unique_ptr<Registry> registry;
 	std::unique_ptr<AssetStore>assetStore;
+	std::unique_ptr<EventBus>eventBus;
 
 public:
 	Game();

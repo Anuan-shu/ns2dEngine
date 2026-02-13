@@ -5,6 +5,7 @@
 #include<bitset>
 #include<memory>
 #include<vector>
+#include<deque>
 #include<unordered_map>
 #include<typeindex>
 #include<set>
@@ -32,6 +33,7 @@ public:
 	Entity(int id) :id(id) {};
 	Entity(const Entity& entity) = default;
 	int GetId() const;
+	void Kill();
 
 	Entity& operator =(const Entity& other) = default;
 	bool operator ==(const Entity& other)const {
@@ -135,6 +137,9 @@ private:
 	std::set<Entity>entitiesToBeAdded;
 	std::set<Entity>entitiesToBeKilled;
 
+	// 已销毁idf复用
+	std::deque<int> freeIds;
+
 public:
 	Registry() {
 		Logger::Log("Registry构造");
@@ -147,6 +152,7 @@ public:
 
 	// 实体
 	Entity CreateEntity();
+	void KillEntity(Entity entity);
 
 	// 组件
 	template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
@@ -160,8 +166,9 @@ public:
 	template <typename TSystem> bool HasSystem()const;
 	template <typename TSystem> TSystem& GetSystem()const;
 
-	// 检查实体组件签名，加入符合系统要求的系统中
+	// 检查实体组件签名，加入/删除符合系统要求的系统中
 	void AddEntityToSystems(Entity entity);
+	void RemoveEntityFromSystems(Entity entity);
 
 };
 

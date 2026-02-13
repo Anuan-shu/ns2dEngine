@@ -11,6 +11,7 @@
 #include"../Systems/AnimationSystem.h"
 #include"../Systems/CollisionSystem.h"
 #include"../Systems/RenderColliderSystem.h"
+#include"../Systems/DamageSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -21,6 +22,7 @@ Game::Game() {
 	isDebug = false;
 	registry = std::make_unique<Registry>();
 	assetStore = std::make_unique<AssetStore>();
+	eventBus = std::make_unique<EventBus>();
 	Logger::Log("Game constructor called");
 }
 Game::~Game() {
@@ -56,7 +58,7 @@ void Game::Initialize() {
 	}
 
 	// 全屏模式
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	// SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	isRunning = true;
 }
@@ -88,6 +90,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<AnimationSystem>();
 	registry->AddSystem<CollisionSytem>();
 	registry->AddSystem<RenderColliderSystem>();
+	registry->AddSystem<DamageSystem>();
 
 	// 资产管理器添加纹理
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -124,7 +127,7 @@ void Game::LoadLevel(int level) {
 	Entity tank = registry->CreateEntity();
 
 	// 添加组件
-	tank.AddComponent<TransformComponent>(glm::vec2(100.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+	tank.AddComponent<TransformComponent>(glm::vec2(200.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
@@ -168,17 +171,19 @@ void Game::Update() {
 	// 记录当前帧时间
 	millisecsPreviousFrame = SDL_GetTicks();
 
-	// TODO:
-	//MovementSystem.Update();
-	//CollisionSystem.Update();
+	// 清空当前帧所有事件处理器
+	eventBus->Reset();
+
+	// 为系统订阅事件
+	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+
+	// 更新注册表 待创建/销毁实体同步
+	registry->Update();
 
 	// 更新系统
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
 	registry->GetSystem<AnimationSystem>().Update();
-	registry->GetSystem<CollisionSytem>().Update();
-
-	// 更新注册表 待创建/销毁实体同步
-	registry->Update();
+	registry->GetSystem<CollisionSytem>().Update(eventBus);
 }
 void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);

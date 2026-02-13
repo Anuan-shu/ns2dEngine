@@ -9,6 +9,8 @@
 #include"../Systems/MovementSystem.h"
 #include"../Systems/RenderSystem.h"
 #include"../Systems/AnimationSystem.h"
+#include"../Systems/CollisionSystem.h"
+#include"../Systems/RenderColliderSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -16,6 +18,7 @@
 #include<fstream>
 Game::Game() {
 	isRunning = false;
+	isDebug = false;
 	registry = std::make_unique<Registry>();
 	assetStore = std::make_unique<AssetStore>();
 	Logger::Log("Game constructor called");
@@ -53,7 +56,7 @@ void Game::Initialize() {
 	}
 
 	// 全屏模式
-	// SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	isRunning = true;
 }
@@ -68,6 +71,10 @@ void Game::ProcessInput() {
 			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
 				isRunning = false;
 			}
+			if (sdlEvent.key.keysym.sym == SDLK_d) {
+				isDebug = !isDebug;
+				Logger::Log("isDebug = " + std::to_string(isDebug));
+			}
 			break;
 		}
 	}
@@ -79,6 +86,8 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
 	registry->AddSystem<AnimationSystem>();
+	registry->AddSystem<CollisionSytem>();
+	registry->AddSystem<RenderColliderSystem>();
 
 	// 资产管理器添加纹理
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -166,6 +175,7 @@ void Game::Update() {
 	// 更新系统
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
 	registry->GetSystem<AnimationSystem>().Update();
+	registry->GetSystem<CollisionSytem>().Update();
 
 	// 更新注册表 待创建/销毁实体同步
 	registry->Update();
@@ -176,6 +186,9 @@ void Game::Render() {
 
 	// TODO: 渲染逻辑
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
+	if (isDebug) {
+		registry->GetSystem<RenderColliderSystem>().Update(renderer);
+	}
 
 	// 前后缓冲区交换
 	SDL_RenderPresent(renderer);

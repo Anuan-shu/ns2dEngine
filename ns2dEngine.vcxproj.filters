@@ -816,6 +816,9 @@
     <ClInclude Include="src\Systems\CollisionSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Systems\RenderColliderSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">

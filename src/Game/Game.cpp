@@ -6,12 +6,14 @@
 #include"../Components/SpriteComponent.h"
 #include"../Components/AnimationComponent.h"
 #include"../Components/BoxColliderComponent.h"
+#include"../Components/KeyboardControlledComponent.h"
 #include"../Systems/MovementSystem.h"
 #include"../Systems/RenderSystem.h"
 #include"../Systems/AnimationSystem.h"
 #include"../Systems/CollisionSystem.h"
 #include"../Systems/RenderColliderSystem.h"
 #include"../Systems/DamageSystem.h"
+#include"../Systems/KeyboardControlSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -77,6 +79,7 @@ void Game::ProcessInput() {
 				isDebug = !isDebug;
 				Logger::Log("isDebug = " + std::to_string(isDebug));
 			}
+			eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
 			break;
 		}
 	}
@@ -91,12 +94,13 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<CollisionSytem>();
 	registry->AddSystem<RenderColliderSystem>();
 	registry->AddSystem<DamageSystem>();
+	registry->AddSystem<KeyboardControlSystem>();
 
 	// 资产管理器添加纹理
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
 	assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
-	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 
 	// 加载瓦片地图
@@ -147,6 +151,7 @@ void Game::LoadLevel(int level) {
 	chopper.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
 	chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
 	chopper.AddComponent<AnimationComponent>(2, 15, true);
+	chopper.AddComponent<KeyboardControlledComponent>(glm::vec2(0, -80), glm::vec2(80, 0), glm::vec2(0, 80), glm::vec2(-80, 0));
 
 	Entity radar = registry->CreateEntity();
 	radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -176,6 +181,7 @@ void Game::Update() {
 
 	// 为系统订阅事件
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+	registry->GetSystem<KeyboardControlSystem>().SubscribeToEvents(eventBus);
 
 	// 更新注册表 待创建/销毁实体同步
 	registry->Update();

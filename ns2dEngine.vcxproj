@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -390,6 +390,7 @@
     <ClInclude Include="src\AssetStore\AssetStore.h" />
     <ClInclude Include="src\Components\AnimationComponent.h" />
     <ClInclude Include="src\Components\BoxColliderComponent.h" />
+    <ClInclude Include="src\Components\KeyboardControlledComponent.h" />
     <ClInclude Include="src\Components\RigidBodyComponent.h" />
     <ClInclude Include="src\Components\SpriteComponent.h" />
     <ClInclude Include="src\Components\TransformComponent.h" />
@@ -397,11 +398,13 @@
     <ClInclude Include="src\EventBus\Event.h" />
     <ClInclude Include="src\EventBus\EventBus.h" />
     <ClInclude Include="src\Events\CollisionEvent.h" />
+    <ClInclude Include="src\Events\KeyPressedEvent.h" />
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\Systems\AnimationSystem.h" />
     <ClInclude Include="src\Systems\CollisionSystem.h" />
     <ClInclude Include="src\Systems\DamageSystem.h" />
+    <ClInclude Include="src\Systems\KeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\MovementSystem.h" />
     <ClInclude Include="src\Systems\RenderColliderSystem.h" />
     <ClInclude Include="src\Systems\RenderSystem.h" />

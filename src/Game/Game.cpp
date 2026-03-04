@@ -8,6 +8,7 @@
 #include"../Components/BoxColliderComponent.h"
 #include"../Components/KeyboardControlledComponent.h"
 #include"../Components/CameraFollowComponent.h"
+#include"../Components/ProjectileEmitterComponent.h"
 #include"../Systems/MovementSystem.h"
 #include"../Systems/RenderSystem.h"
 #include"../Systems/AnimationSystem.h"
@@ -16,6 +17,7 @@
 #include"../Systems/DamageSystem.h"
 #include"../Systems/KeyboardControlSystem.h"
 #include"../Systems/CameraMoventSystem.h"
+#include"../Systems/ProjectileEmitSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
@@ -110,6 +112,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<DamageSystem>();
 	registry->AddSystem<KeyboardControlSystem>();
 	registry->AddSystem<CameraMoventSystem>();
+	registry->AddSystem<ProjectileEmitSystem>();
 
 	// 资产管理器添加纹理
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -117,6 +120,7 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
+	assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
 
 	// 加载瓦片地图
 	int tileSize = 32;
@@ -137,7 +141,7 @@ void Game::LoadLevel(int level) {
 
 			Entity tile = registry->CreateEntity();
 			tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
+			tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
 		}
 	}
 	mapFile.close();
@@ -149,9 +153,10 @@ void Game::LoadLevel(int level) {
 
 	// 添加组件
 	tank.AddComponent<TransformComponent>(glm::vec2(200.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
+	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, 0, false);
 
 	// tank.RemoveComponent<TransformComponent>();
 
@@ -162,6 +167,7 @@ void Game::LoadLevel(int level) {
 	truck.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
 	truck.AddComponent<SpriteComponent>("truck-image", 32, 32, 2);
 	truck.AddComponent<BoxColliderComponent>(32, 32);
+	truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, 0, false);
 
 	Entity chopper = registry->CreateEntity();
 	chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -174,7 +180,7 @@ void Game::LoadLevel(int level) {
 	Entity radar = registry->CreateEntity();
 	radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);
 	radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
+	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
 	radar.AddComponent<AnimationComponent>(8, 5, true);
 
 }
@@ -208,6 +214,7 @@ void Game::Update() {
 	registry->GetSystem<MovementSystem>().Update(deltaTime);
 	registry->GetSystem<AnimationSystem>().Update();
 	registry->GetSystem<CollisionSytem>().Update(eventBus);
+	registry->GetSystem<ProjectileEmitSystem>().Update(registry);
 	registry->GetSystem<CameraMoventSystem>().Update(camera);
 }
 void Game::Render() {
@@ -217,7 +224,7 @@ void Game::Render() {
 	// TODO: 渲染逻辑
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
 	if (isDebug) {
-		registry->GetSystem<RenderColliderSystem>().Update(renderer);
+		registry->GetSystem<RenderColliderSystem>().Update(renderer, camera);
 	}
 
 	// 前后缓冲区交换

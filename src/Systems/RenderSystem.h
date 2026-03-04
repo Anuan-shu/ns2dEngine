@@ -44,8 +44,8 @@ public:
 
 			// 设置目标矩形，确定精灵在SDL窗口显示位置
 			SDL_Rect dstRect = {
-				static_cast<int>(transform.position.x - camera.x),
-				static_cast<int>(transform.position.y - camera.y),
+				static_cast<int>(transform.position.x - (sprite.isFixed ? 0 : camera.x)),
+				static_cast<int>(transform.position.y - (sprite.isFixed ? 0 : camera.y)),
 				static_cast<int>(sprite.width * transform.scale.x),
 				static_cast<int>(sprite.height * transform.scale.y)
 			};

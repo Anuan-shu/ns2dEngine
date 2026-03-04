@@ -392,6 +392,7 @@
     <ClInclude Include="src\Components\BoxColliderComponent.h" />
     <ClInclude Include="src\Components\CameraFollowComponent.h" />
     <ClInclude Include="src\Components\KeyboardControlledComponent.h" />
+    <ClInclude Include="src\Components\ProjectileEmitterComponent.h" />
     <ClInclude Include="src\Components\RigidBodyComponent.h" />
     <ClInclude Include="src\Components\SpriteComponent.h" />
     <ClInclude Include="src\Components\TransformComponent.h" />
@@ -408,6 +409,7 @@
     <ClInclude Include="src\Systems\DamageSystem.h" />
     <ClInclude Include="src\Systems\KeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\MovementSystem.h" />
+    <ClInclude Include="src\Systems\ProjectileEmitSystem.h" />
     <ClInclude Include="src\Systems\RenderColliderSystem.h" />
     <ClInclude Include="src\Systems\RenderSystem.h" />
   </ItemGroup>

@@ -19,8 +19,8 @@ public:
 	}
 	void onCollision(CollisionEvent& event) {
 		Logger::Log("DamageSystem 收到两个实体的碰撞事件: entityId = " + std::to_string(event.a.GetId()) + "和entityId = " + std::to_string(event.b.GetId()));
-		event.a.Kill();
-		event.b.Kill();
+		/*event.a.Kill();
+		event.b.Kill();*/
 	}
 	void Update() {
 

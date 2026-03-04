@@ -46,6 +46,9 @@ public:
 				rigidbody.velocity = keyboardcontrol.leftVelocity;
 				sprite.srcRect.y = sprite.height * 3;
 				break;
+			case SDLK_SPACE:
+
+				break;
 			}
 
 		}

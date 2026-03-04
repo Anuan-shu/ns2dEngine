@@ -837,6 +837,15 @@
     <ClInclude Include="src\Events\KeyPressedEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Components\KeyboardControlledComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\CameraFollowComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\CameraMoventSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">

@@ -166,7 +166,8 @@ void Registry::Update() {
 
 		// 从所有组件池中删除实体
 		for (auto pool : componentPools) {
-			pool->RemoveEntityFromPool(entity.GetId());
+			if (pool)
+				pool->RemoveEntityFromPool(entity.GetId());
 		}
 
 		freeIds.push_back(entity.GetId());

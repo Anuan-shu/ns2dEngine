@@ -5,6 +5,8 @@
 #include<memory>
 #include"../ECS/ECS.h"
 #include"../Components/BoxColliderComponent.h"
+#include"../Components/ProjectileComponent.h"
+#include"../Components/HealthComponent.h"
 #include"../EventBus/EventBus.h"
 #include"../Events/CollisionEvent.h"
 
@@ -19,9 +21,55 @@ public:
 	}
 	void onCollision(CollisionEvent& event) {
 		Logger::Log("DamageSystem 收到两个实体的碰撞事件: entityId = " + std::to_string(event.a.GetId()) + "和entityId = " + std::to_string(event.b.GetId()));
-		/*event.a.Kill();
-		event.b.Kill();*/
+		Entity a = event.a;
+		Entity b = event.b;
+
+		if (a.BelongsToGroup("projectiles") && b.HasTag("player")) {
+			onProjectileHitsPlayer(a, b);
+		}
+
+		if (b.BelongsToGroup("projectiles") && a.HasTag("player")) {
+			onProjectileHitsPlayer(b, a);
+		}
+
+		if (a.BelongsToGroup("projectiles") && b.BelongsToGroup("enemies")) {
+			onProjectileHitsEnemy(a, b);
+		}
+
+		if (b.BelongsToGroup("projectiles") && a.BelongsToGroup("enemies")) {
+			onProjectileHitsEnemy(b, a);
+		}
+
 	}
+	void onProjectileHitsEnemy(Entity projectile, Entity enemy) {
+		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
+
+		if (projectileComponent.isFriendly) {
+			auto& healeh = enemy.GetComponent<HealthComponent>();
+			healeh.healthPercentage -= projectileComponent.hitPercentDamage;
+
+			if (healeh.healthPercentage <= 0) {
+				enemy.Kill();
+			}
+
+			projectile.Kill();
+		}
+	}
+	void onProjectileHitsPlayer(Entity projectile, Entity player) {
+		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
+
+		if (!projectileComponent.isFriendly) {
+			auto& healeh = player.GetComponent<HealthComponent>();
+			healeh.healthPercentage -= projectileComponent.hitPercentDamage;
+
+			if (healeh.healthPercentage <= 0) {
+				player.Kill();
+			}
+
+			projectile.Kill();
+		}
+	}
+
 	void Update() {
 
 	}

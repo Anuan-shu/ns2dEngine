@@ -35,6 +35,12 @@ public:
 	int GetId() const;
 	void Kill();
 
+	// 标签和分组
+	void Tag(const std::string& tag);
+	bool HasTag(const std::string& tag)const;
+	void Group(const std::string& group);
+	bool BelongsToGroup(const std::string& group)const;
+
 	Entity& operator =(const Entity& other) = default;
 	bool operator ==(const Entity& other)const {
 		return id == other.id;
@@ -137,6 +143,14 @@ private:
 	std::set<Entity>entitiesToBeAdded;
 	std::set<Entity>entitiesToBeKilled;
 
+	// 实体标签
+	std::unordered_map<std::string, Entity>entityPerTag;
+	std::unordered_map<int, std::string>tagPerEntity;
+
+	// 实体分组
+	std::unordered_map<std::string, std::set<Entity>>entitiesPerGroup;
+	std::unordered_map<int, std::string>groupPerEntity;
+
 	// 已销毁idf复用
 	std::deque<int> freeIds;
 
@@ -153,6 +167,18 @@ public:
 	// 实体
 	Entity CreateEntity();
 	void KillEntity(Entity entity);
+
+	// 标签
+	void TagEntity(Entity entity, const std::string& tag);
+	bool EntityHasTag(Entity entity, const std::string& tag)const;
+	Entity GetEntityByTag(const std::string& tag)const;
+	void RemoveEntityTag(Entity entity);
+
+	// 分组
+	void GroupEntity(Entity entity, const std::string& group);
+	bool EntityBelongsToGroup(Entity entity, const std::string& group)const;
+	std::vector<Entity>GetEntitiesByGroup(const std::string& group)const;
+	void RemoveEntityGroup(Entity entity);
 
 	// 组件
 	template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);

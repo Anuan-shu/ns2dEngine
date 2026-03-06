@@ -870,6 +870,12 @@
     <ClInclude Include="src\Systems\RenderHealthBarSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_impl_sdl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\RenderGUISystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">
@@ -1302,6 +1308,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\AssetStore\AssetStore.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_impl_sdl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

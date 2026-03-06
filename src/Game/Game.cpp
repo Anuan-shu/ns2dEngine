@@ -23,9 +23,13 @@
 #include"../Systems/ProjectileLifecycleSystem.h"
 #include"../Systems/RenderTextSystem.h"
 #include"../Systems/RenderHealthBarSystem.h"
+#include"../Systems/RenderGUISystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
 #include<glm/glm.hpp>
+#include<imgui/imgui.h>
+#include<imgui/imgui_sdl.h>
+#include<imgui/imgui_impl_sdl.h>
 #include<iostream>
 #include<fstream>
 
@@ -79,6 +83,10 @@ void Game::Initialize() {
 		return;
 	}
 
+	// imgui初始化
+	ImGui::CreateContext();
+	ImGuiSDL::Initialize(renderer, windowWidth, windowHeight);
+
 	// 全屏模式
 	// SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -93,6 +101,18 @@ void Game::Initialize() {
 void Game::ProcessInput() {
 	SDL_Event sdlEvent;
 	while (SDL_PollEvent(&sdlEvent)) {
+		// imgui 输入
+		ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+		ImGuiIO& io = ImGui::GetIO();
+
+		int mouseX, mouseY;
+		const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+
+		io.MousePos = ImVec2(mouseX, mouseY);
+		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
+		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+
+
 		switch (sdlEvent.type) {
 		case SDL_QUIT:
 			isRunning = false;
@@ -126,6 +146,7 @@ void Game::LoadLevel(int level) {
 	registry->AddSystem<ProjectileLifecycleSystem>();
 	registry->AddSystem<RenderTextSystem>();
 	registry->AddSystem<RenderHealthBarSystem>();
+	registry->AddSystem<RenderGUISystem>();
 
 	// 资产管理器添加纹理
 	assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -256,11 +277,14 @@ void Game::Render() {
 
 	// TODO: 渲染逻辑
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
-	if (isDebug) {
-		registry->GetSystem<RenderColliderSystem>().Update(renderer, camera);
-	}
 	registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
 	registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
+	if (isDebug) {
+		registry->GetSystem<RenderColliderSystem>().Update(renderer, camera);
+
+		registry->GetSystem<RenderGUISystem>().Update(registry, camera);
+	}
+
 
 	// 前后缓冲区交换
 	SDL_RenderPresent(renderer);
@@ -275,6 +299,8 @@ void Game::Run() {
 }
 
 void Game::Destroy() {
+	ImGuiSDL::Deinitialize();
+	ImGui::DestroyContext();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();

@@ -26,6 +26,18 @@ public:
 			RenderableEntity renderableEntity;
 			renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
 			renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
+
+			bool isEntityOutsideCameraView = (
+				renderableEntity.transformComponent.position.x + (renderableEntity.transformComponent.scale.x * renderableEntity.spriteComponent.width) < camera.x ||
+				renderableEntity.transformComponent.position.x > camera.x + camera.w ||
+				renderableEntity.transformComponent.position.y + (renderableEntity.transformComponent.scale.y * renderableEntity.spriteComponent.height) < camera.y ||
+				renderableEntity.transformComponent.position.y > camera.y + camera.h
+				);
+
+			if (isEntityOutsideCameraView) {
+				continue;
+			}
+
 			renderableEntities.emplace_back(renderableEntity);
 		}
 

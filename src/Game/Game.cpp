@@ -155,6 +155,7 @@ void Game::LoadLevel(int level) {
 	assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
 	assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
 	assetStore->AddTexture(renderer, "bullet-image", "./assets/images/bullet.png");
+	assetStore->AddTexture(renderer, "tree-image", "./assets/images/tree.png");
 
 	// 资产管理器添加字体
 	assetStore->AddFont("charriot-font", "./assets/fonts/charriot.ttf", 14);
@@ -194,7 +195,7 @@ void Game::LoadLevel(int level) {
 	tank.Group("enemies");
 	// 添加组件
 	tank.AddComponent<TransformComponent>(glm::vec2(200.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
-	tank.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+	tank.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
 	tank.AddComponent<SpriteComponent>("tank-image", 32, 32, 1);
 	tank.AddComponent<BoxColliderComponent>(32, 32);
 	tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 1000, 10, false);
@@ -231,9 +232,22 @@ void Game::LoadLevel(int level) {
 	radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
 	radar.AddComponent<AnimationComponent>(8, 5, true);
 
+	Entity treeA = registry->CreateEntity();
+	treeA.Group("obstacles");
+	treeA.AddComponent<TransformComponent>(glm::vec2(300, 10), glm::vec2(1.0, 1.0), 0.0);
+	treeA.AddComponent<SpriteComponent>("tree-image", 16, 32, 2, false);
+	treeA.AddComponent<BoxColliderComponent>(16, 32);
+
+	Entity treeB = registry->CreateEntity();
+	treeB.Group("obstacles");
+	treeB.AddComponent<TransformComponent>(glm::vec2(150, 10), glm::vec2(1.0, 1.0), 0.0);
+	treeB.AddComponent<SpriteComponent>("tree-image", 16, 32, 2, false);
+	treeB.AddComponent<BoxColliderComponent>(16, 32);
+
 	Entity label = registry->CreateEntity();
 	SDL_Color white = { 255,255,255 };
 	label.AddComponent<TextLabelComponent>(glm::vec2(windowWidth / 2 - 40, 10), "CHOPPER", "charriot-font", white, true);
+
 
 }
 
@@ -256,6 +270,7 @@ void Game::Update() {
 	eventBus->Reset();
 
 	// 为系统订阅事件
+	registry->GetSystem<MovementSystem>().SubscribeToEvents(eventBus);
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 	registry->GetSystem<KeyboardControlSystem>().SubscribeToEvents(eventBus);
 	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventBus);

@@ -54,8 +54,8 @@ void Game::Initialize() {
 	// 获取显示器相关
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
-	windowWidth = 600; // displayMode.w;
-	windowHeight = 450;//displayMode.h;
+	windowWidth = displayMode.w;
+	windowHeight = displayMode.h;
 
 	window = SDL_CreateWindow(
 		NULL,
@@ -141,9 +141,12 @@ void Game::Setup() {
 	registry->AddSystem<RenderGUISystem>();
 	registry->AddSystem<ScriptSystem>();
 
+	// cpp函数与lua函数绑定
+	registry->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
+
 	LevelLoader loader;
 	lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
-	loader.LoadLevel(lua, registry, assetStore, renderer, 1);
+	loader.LoadLevel(lua, registry, assetStore, renderer, 2);
 }
 void Game::Update() {
 	// 固定帧率上限
@@ -176,7 +179,7 @@ void Game::Update() {
 	registry->GetSystem<ProjectileEmitSystem>().Update(registry);
 	registry->GetSystem<CameraMoventSystem>().Update(camera);
 	registry->GetSystem<ProjectileLifecycleSystem>().Update();
-	registry->GetSystem<ScriptSystem>().Update();
+	registry->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 }
 void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);

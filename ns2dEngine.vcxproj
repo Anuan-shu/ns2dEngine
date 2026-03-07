@@ -426,6 +426,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\scripts\level1.lua" />
+    <None Include="assets\scripts\level2.lua" />
     <None Include="assets\scripts\myscript.lua" />
     <None Include="assets\tilemaps\._desert.map" />
     <None Include="assets\tilemaps\._jungle.map" />

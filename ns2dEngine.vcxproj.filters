@@ -1290,6 +1290,7 @@
     <None Include="assets\tilemaps\._jungle.map" />
     <None Include="assets\tilemaps\desert.map" />
     <None Include="assets\tilemaps\jungle.map" />
+    <None Include="assets\scripts\level2.lua" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libs\glm\detail\glm.cpp">

@@ -1,0 +1,54 @@
+cmake_minimum_required(VERSION 3.16)
+project(ns2d_physics_tests LANGUAGES CXX)
+enable_testing()
+add_executable(physics_tests tests/physics_tests.cpp)
+target_compile_features(physics_tests PRIVATE cxx_std_17)
+target_include_directories(physics_tests SYSTEM PRIVATE libs)
+add_test(NAME physics_tests COMMAND physics_tests)
+
+# Optional integration test with real SDL headers/library and the project's ECS.
+set(SDL2_INCLUDE_DIR "" CACHE PATH "Directory containing SDL.h")
+set(SDL2_LIBRARY "" CACHE FILEPATH "SDL2 import library")
+if(SDL2_INCLUDE_DIR AND SDL2_LIBRARY)
+    add_executable(physics_ecs_tests tests/physics_ecs_tests.cpp src/ECS/ECS.cpp src/Logger/Logger.cpp)
+    target_compile_features(physics_ecs_tests PRIVATE cxx_std_17)
+    target_include_directories(physics_ecs_tests SYSTEM PRIVATE libs "${SDL2_INCLUDE_DIR}")
+    target_link_libraries(physics_ecs_tests PRIVATE "${SDL2_LIBRARY}")
+    add_test(NAME physics_ecs_tests COMMAND physics_ecs_tests)
+    set_tests_properties(physics_ecs_tests PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+endif()
+
+option(NS2D_BUILD_GAME "Build the game and headless smoke tests (Windows/MinGW)" OFF)
+set(SDL2_IMAGE_ROOT "" CACHE PATH "SDL_image x86_64-w64-mingw32 directory")
+set(SDL2_TTF_ROOT "" CACHE PATH "SDL_ttf x86_64-w64-mingw32 directory")
+if(NS2D_BUILD_GAME)
+    if(NOT SDL2_INCLUDE_DIR OR NOT SDL2_LIBRARY OR NOT SDL2_IMAGE_ROOT OR NOT SDL2_TTF_ROOT)
+        message(FATAL_ERROR "Set SDL2_INCLUDE_DIR, SDL2_LIBRARY, SDL2_IMAGE_ROOT, SDL2_TTF_ROOT")
+    endif()
+    add_library(ns2d_game_core STATIC
+        src/Game/Game.cpp src/Game/LevelLoader.cpp src/ECS/ECS.cpp
+        src/Logger/Logger.cpp src/AssetStore/AssetStore.cpp
+        libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_widgets.cpp
+        libs/imgui/imgui_sdl.cpp libs/imgui/imgui_impl_sdl.cpp)
+    target_compile_features(ns2d_game_core PUBLIC cxx_std_17)
+    target_compile_definitions(ns2d_game_core PUBLIC SDL_MAIN_HANDLED)
+    target_include_directories(ns2d_game_core SYSTEM PUBLIC libs libs/lua "${SDL2_INCLUDE_DIR}"
+        "${SDL2_IMAGE_ROOT}/include/SDL2" "${SDL2_TTF_ROOT}/include/SDL2")
+    # Bundled legacy sol has an unused template rejected by GCC 16's eager checking.
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
+        target_compile_options(ns2d_game_core PUBLIC -Wno-template-body)
+    endif()
+    target_link_libraries(ns2d_game_core PUBLIC "${SDL2_LIBRARY}"
+        "${SDL2_IMAGE_ROOT}/lib/libSDL2_image.dll.a" "${SDL2_TTF_ROOT}/lib/libSDL2_ttf.dll.a"
+        "${CMAKE_SOURCE_DIR}/libs/lua/liblua53.a")
+    add_executable(ns2dEngine src/Main.cpp)
+    target_link_libraries(ns2dEngine PRIVATE ns2d_game_core)
+    add_executable(physics_game_smoke tests/physics_game_smoke.cpp)
+    target_link_libraries(physics_game_smoke PRIVATE ns2d_game_core)
+    foreach(level 2 3)
+        add_test(NAME game_level_${level}_smoke COMMAND physics_game_smoke ${level})
+        set_tests_properties(game_level_${level}_smoke PROPERTIES
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy" TIMEOUT 30)
+    endforeach()
+endif()

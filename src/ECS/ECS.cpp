@@ -1,4 +1,4 @@
-#include "ECS.h"
+﻿#include "ECS.h"
 #include "../Logger/Logger.h"
 int IComponent::nextId = 0;
 
@@ -199,7 +199,7 @@ void Registry::Update()
 
 		entityComponentSignatures[entity.GetId()].reset();
 
-		// �������������ɾ��ʵ��
+		// 从所有组件池中移除该实体的组件。
 		for (auto pool : componentPools)
 		{
 			if (pool)

@@ -1,4 +1,4 @@
-#include"Game.h"
+ï»¿#include"Game.h"
 #include"../Logger/Logger.h"
 #include"LevelLoader.h"
 #include"../ECS/ECS.h"
@@ -51,7 +51,7 @@ void Game::Initialize() {
 		Logger::Err("Error initializing TTF");
 		return;
 	}
-	// »ñÈ¡ÏÔÊ¾Æ÷Ïà¹Ø
+	// è·å–æ˜¾ç¤ºå™¨ç›¸å…³
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	windowWidth = displayMode.w;
@@ -75,14 +75,14 @@ void Game::Initialize() {
 		return;
 	}
 
-	// imgui³õÊ¼»¯
+	// imguiåˆå§‹åŒ–
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(renderer, windowWidth, windowHeight);
 
-	// È«ÆÁÄ£Ê½
+	// å…¨å±æ¨¡å¼
 	// SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
-	// ÉãÏñ»úÉèÖÃ
+	// æ‘„åƒæœºè®¾ç½®
 	camera.x = 0;
 	camera.y = 0;
 	camera.w = windowWidth;
@@ -93,7 +93,7 @@ void Game::Initialize() {
 void Game::ProcessInput() {
 	SDL_Event sdlEvent;
 	while (SDL_PollEvent(&sdlEvent)) {
-		// imgui ÊäÈë
+		// imgui è¾“å…¥
 		ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -126,7 +126,7 @@ void Game::ProcessInput() {
 
 void Game::Setup(int level) {
 	isDebug = level == 3;
-	// ¸øÓÎÏ·Ìí¼ÓÏµÍ³
+	// ç»™æ¸¸æˆæ·»åŠ ç³»ç»Ÿ
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
 	registry->AddSystem<AnimationSystem>();
@@ -142,7 +142,7 @@ void Game::Setup(int level) {
 	registry->AddSystem<RenderGUISystem>();
 	registry->AddSystem<ScriptSystem>();
 
-	// cppº¯ÊıÓëluaº¯Êı°ó¶¨
+	// cppå‡½æ•°ä¸luaå‡½æ•°ç»‘å®š
 	registry->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
 
 	LevelLoader loader;
@@ -154,7 +154,7 @@ void Game::Setup(int level) {
 	registry->Update();
 }
 void Game::Update() {
-	// ¹Ì¶¨Ö¡ÂÊÉÏÏŞ
+	// å›ºå®šå¸§ç‡ä¸Šé™
 	int timeToWait = MILLISECS_PER_FRAME - static_cast<int>(SDL_GetTicks() - millisecsPreviousFrame);
 	if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) {
 		SDL_Delay(timeToWait);
@@ -162,13 +162,13 @@ void Game::Update() {
 
 	double deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
 
-	// ¼ÇÂ¼µ±Ç°Ö¡Ê±¼ä
+	// è®°å½•å½“å‰å¸§æ—¶é—´
 	millisecsPreviousFrame = SDL_GetTicks();
 
-	// Apply entity changes before fixed physics steps.
+	// æ‰§è¡Œå›ºå®šç‰©ç†æ­¥ä¹‹å‰ï¼Œå…ˆæäº¤å®ä½“çš„åˆ›å»ºä¸é”€æ¯ã€‚
 	registry->Update();
 
-	// ¸üĞÂÏµÍ³
+	// æ›´æ–°ç³»ç»Ÿ
 	physicsClock.Advance(deltaTime, [&](float step) {
 		registry->GetSystem<ScriptSystem>().Update(step, SDL_GetTicks());
 		registry->GetSystem<MovementSystem>().Update(step);
@@ -185,7 +185,7 @@ void Game::Render() {
 	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
-	// TODO: äÖÈ¾Âß¼­
+	// TODO: æ¸²æŸ“é€»è¾‘
 	registry->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
 	registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
 	registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
@@ -196,7 +196,7 @@ void Game::Render() {
 	}
 
 
-	// Ç°ºó»º³åÇø½»»»
+	// å‰åç¼“å†²åŒºäº¤æ¢
 	SDL_RenderPresent(renderer);
 }
 void Game::Run(int level) {

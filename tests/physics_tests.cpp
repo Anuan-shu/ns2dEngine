@@ -77,7 +77,7 @@ int main() {
         a.type = BodyType::Kinematic; Integrate(ta, a, 1, {0, 10});
         Check(Near(ta.position.x - position.x, 100) && Near(a.velocity.y, 100), "kinematic ignores forces");
 
-        // Compare broad phase against brute force, including random rotations/circles.
+        // 将宽阶段筛选与暴力遍历结果对照，覆盖随机旋转的矩形和圆形。
         std::mt19937 random(42); std::uniform_real_distribution<float> dist(-50, 50);
         std::vector<WorldShape> shapes;
         for (int i = 0; i < 200; ++i) shapes.push_back(i % 2 ? Box(dist(random), dist(random), 10, 3, dist(random)) : Circle(dist(random), dist(random), 4));
@@ -85,7 +85,7 @@ int main() {
         for (auto pair : Candidates(shapes)) candidates.emplace((std::min)(pair.first, pair.second), (std::max)(pair.first, pair.second));
         for (std::size_t i = 0; i < shapes.size(); ++i) for (std::size_t j = i+1; j < shapes.size(); ++j)
             Check(!Collide(shapes[i], shapes[j], c) || candidates.count({i, j}) != 0, "broad phase must not miss narrow phase hit");
-        // Same simulated duration under several rendering rates.
+        // 在不同渲染帧率下模拟相同时长，验证物理结果一致。
         for (int fps : {30, 60, 144}) {
             FixedStepClock clock; RigidBodyComponent body({120, 0}); TransformComponent transform;
             int steps = 0;
@@ -94,7 +94,7 @@ int main() {
         }
         FixedStepClock clock;
         Check(clock.Advance(10, [](float) {}) == 8 && clock.Advance(0, [](float) {}) == 0, "catch-up bound drops overload");
-        // Settling under gravity should not sink or gain bounce energy.
+        // 物体在重力下静止后，不应持续下沉或获得额外反弹能量。
         ta = TransformComponent({0, 0}); a = RigidBodyComponent(); a.gravityScale = 1; a.restitution = 0;
         ColliderComponent box(10, 10); const auto floor = Box(-100, 20, 200, 10); tb = TransformComponent();
         for (int tick = 0; tick < 1200; ++tick) {

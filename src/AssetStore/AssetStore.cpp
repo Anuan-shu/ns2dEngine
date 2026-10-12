@@ -1,13 +1,13 @@
-#include"./AssetStore.h"
+ï»¿#include"./AssetStore.h"
 #include"../Logger/Logger.h"
 #include<SDL_image.h>
 
 AssetStore::AssetStore() {
-	Logger::Log("AssetStore ¹¹Ôì");
+	Logger::Log("AssetStore æ„é€ ");
 }
 AssetStore::~AssetStore() {
 	ClearAssets();
-	Logger::Log("AssetStore Îö¹¹");
+	Logger::Log("AssetStore ææ„");
 }
 
 void AssetStore::ClearAssets() {
@@ -27,10 +27,10 @@ void AssetStore::AddTexture(SDL_Renderer* renderer, const std::string& assetId, 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
-	// ÎÆÀíÌí¼Ó½øÓ³Éä
+	// çº¹ç†æ·»åŠ è¿›æ˜ å°„
 	textures.emplace(assetId, texture);
 
-	Logger::Log("ĞÂÎÆÀíÒÑ¼ÓÈë£¬assetId = " + assetId);
+	Logger::Log("æ–°çº¹ç†å·²åŠ å…¥ï¼ŒassetId = " + assetId);
 }
 
 SDL_Texture* AssetStore::GetTexture(const std::string& assetId) {

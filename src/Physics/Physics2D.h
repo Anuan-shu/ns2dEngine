@@ -19,14 +19,14 @@ struct WorldShape {
     bool valid = false;
 };
 struct Contact {
-    glm::vec2 normal{1, 0}; // From A toward B; move A opposite this normal.
+    glm::vec2 normal{1, 0}; // 法线由 A 指向 B；修正穿透时，A 沿法线反方向移动。
     float penetration = 0;
 };
 inline glm::vec2 Rotate(glm::vec2 p, glm::vec2 x, glm::vec2 y) { return x * p.x + y * p.y; }
 inline glm::vec2 LocalCenter(const ColliderComponent& c) {
     return c.offset + (c.shape == ColliderShape::Circle ? glm::vec2(c.radius) : glm::vec2(c.width, c.height) * 0.5f);
 }
-// Local-pixel pivot: use sprite center to match SDL_RenderCopyEx.
+// 旋转中心使用局部像素坐标；取精灵中心可与 SDL_RenderCopyEx 保持一致。
 inline WorldShape MakeShape(const TransformComponent& t, const ColliderComponent& c, glm::vec2 pivot) {
     WorldShape s;
     s.type = c.shape;
@@ -35,7 +35,7 @@ inline WorldShape MakeShape(const TransformComponent& t, const ColliderComponent
     s.yAxis = {-s.xAxis.y, s.xAxis.x};
     s.center = t.position + pivot * t.scale + Rotate((LocalCenter(c) - pivot) * t.scale, s.xAxis, s.yAxis);
     s.half = glm::abs(glm::vec2(c.width, c.height) * t.scale) * 0.5f;
-    // Nonuniform circle scale uses a conservative enclosing circle, not an ellipse.
+    // 圆形非均匀缩放时使用保守的外包圆，不按椭圆处理。
     s.radius = c.radius * (std::max)(std::abs(t.scale.x), std::abs(t.scale.y));
     s.valid = c.shape == ColliderShape::Circle ? c.radius > 0 && s.radius > Epsilon
         : c.width > 0 && c.height > 0 && s.half.x > Epsilon && s.half.y > Epsilon;
@@ -94,7 +94,7 @@ inline bool BoxCircle(const WorldShape& box, const WorldShape& circle, Contact& 
         contact.normal = Rotate(difference / distance, box.xAxis, box.yAxis);
         contact.penetration = circle.radius - distance;
     } else {
-        // Containment: select the nearest exit face, not a zero-length normal.
+        // 圆心位于矩形内部时，选择最近的出口边，避免产生零长度法线。
         const auto remaining = box.half - glm::abs(local);
         if (remaining.x < remaining.y) {
             contact.normal = box.xAxis * (local.x < 0 ? -1.0f : 1.0f);
@@ -115,7 +115,7 @@ inline bool Collide(const WorldShape& a, const WorldShape& b, Contact& contact) 
     contact.normal = -contact.normal;
     return hit;
 }
-// Sort-and-sweep on world AABBs. Dense worst case remains O(n^2).
+// 对世界空间 AABB 排序并扫描；密集场景下最坏复杂度仍为 O(n²)。
 inline std::vector<std::pair<std::size_t, std::size_t>> Candidates(const std::vector<WorldShape>& shapes) {
     std::vector<std::size_t> order;
     for (std::size_t i = 0; i < shapes.size(); ++i) if (shapes[i].valid) order.push_back(i);
@@ -152,7 +152,7 @@ inline void ResolveVelocity(RigidBodyComponent* a, RigidBodyComponent* b, const 
     if (speed >= 0) return;
     const float restitution = (std::min)(a ? glm::clamp(a->restitution, 0.0f, 1.0f) : 1.0f,
                                         b ? glm::clamp(b->restitution, 0.0f, 1.0f) : 1.0f);
-    // Suppress tiny bounces for resting contacts, in pixels/second.
+    // 抑制静止接触中的微小反弹；速度单位为像素/秒。
     const float impulse = -(1 + (speed < -1.0f ? restitution : 0.0f)) * speed / sum;
     if (a) a->velocity -= c.normal * (impulse * ia);
     if (b) b->velocity += c.normal * (impulse * ib);

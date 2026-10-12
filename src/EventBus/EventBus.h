@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef EVENTBUS_H
 #define EVENTBUS_H
 
@@ -50,10 +50,10 @@ private:
 	std::map<std::type_index, std::unique_ptr<HandlerList>>subscribers;
 public:
 	EventBus() {
-		Logger::Log("EventBus ¹¹Ôì");
+		Logger::Log("EventBus æ„é€ ");
 	}
 	~EventBus() {
-		Logger::Log("EventBus Îö¹¹");
+		Logger::Log("EventBus ææ„");
 	}
 
 	void Reset() {
@@ -69,7 +69,7 @@ public:
 		subscribers[typeid(TEvent)]->push_back(std::move(subscriber));
 	}
 
-	// ´¥·¢ÊÂ¼ş
+	// è§¦å‘äº‹ä»¶
 	template <typename TEvent, typename ...TArgs>
 	void EmitEvent(TArgs&& ...args) {
 		auto handlers = subscribers[typeid(TEvent)].get();

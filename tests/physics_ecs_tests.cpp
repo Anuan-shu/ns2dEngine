@@ -41,7 +41,7 @@ int main() {
         Check(listener.count == 2, "filter prevents event");
         a.Kill(); registry.Update(); b.Kill(); registry.Update();
 
-        // Actual DamageSystem: one bullet overlapping two targets deals damage once.
+        // 验证真实伤害系统：一发子弹同时重叠两个目标时，只造成一次伤害。
         DamageSystem damage;
         damage.SubscribeToEvents(bus);
         auto bullet = registry.CreateEntity();
@@ -64,7 +64,7 @@ int main() {
         registry.Update();
         registry.GetSystem<CollisionSystem>().Update(bus);
         Check(target1.GetComponent<HealthComponent>().healthPercentage + target2.GetComponent<HealthComponent>().healthPercentage == 190, "no damage next substep");
-        // Sprite-center rotation must match the standalone geometric contract.
+        // 绕精灵中心旋转的结果，必须与独立几何计算的约定一致。
         target1.AddComponent<SpriteComponent>("test", 20, 20);
         target1.GetComponent<TransformComponent>() = TransformComponent({100, 200}, {2, 3}, 90);
         target1.GetComponent<ColliderComponent>() = ColliderComponent(10, 4, {2, 1});

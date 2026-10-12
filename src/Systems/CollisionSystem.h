@@ -31,7 +31,7 @@ public:
             }
         }
         contactCount = contacts.size();
-        // Translation-only sequential impulses; triggers never enter the solver.
+        // 使用顺序冲量法解算平移响应；触发器不参与物理响应求解。
         for (int iteration = 0; iteration < 6; ++iteration) {
             for (auto& pair : contacts) {
                 if (pair.trigger) continue;
@@ -45,13 +45,13 @@ public:
                 }
             }
         }
-        // Dispatch once per pair per physics step, after solving. Kill() is deferred,
-        // so skip pending removals to prevent one projectile damaging several targets.
+        // 求解后，每对接触在每个物理步只发送一次事件。Kill() 会延迟销毁实体，
+        // 因此跳过待销毁实体，避免同一发子弹继续伤害多个目标。
         for (auto& pair : contacts) {
             if (pair.a.registry->IsPendingRemoval(pair.a) || pair.b.registry->IsPendingRemoval(pair.b)) continue;
             eventBus->EmitEvent<CollisionEvent>(pair.a, pair.b, pair.contact.normal, pair.contact.penetration, pair.trigger);
         }
     }
 };
-// Compatibility with the old misspelling in downstream code.
+// 保留旧名称的别名，兼容使用原拼写的调用代码。
 using CollisionSytem = CollisionSystem;

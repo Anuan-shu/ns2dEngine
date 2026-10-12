@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef RENDERGUISYSTEM_H
 #define RENDERGUISYSTEM_H
 #include"../ECS/ECS.h"
@@ -70,7 +70,7 @@ public:
 			if (ImGui::Button("Create new enemy")) {
 				Entity enemy = registry->CreateEntity();
 				enemy.Group("enemies");
-				// Ìí¼Ó×é¼þ
+				// æ·»åŠ ç»„ä»¶
 				enemy.AddComponent<TransformComponent>(glm::vec2(enemyXPos, enemyYPos), glm::vec2(scaleX, scaleY), glm::degrees(rotation));
 				enemy.AddComponent<RigidBodyComponent>(glm::vec2(velX, velY));
 				enemy.AddComponent<SpriteComponent>(sprites[selectedSpriteIndex], 32, 32, 2);

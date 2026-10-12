@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef CAMERAMOVENTSYSTEM_H
 #define CAMERAMOVENTSYSTEM_H
 
@@ -32,7 +32,7 @@ public:
 			camera.y = camera.y > camera.h ? camera.h : camera.y;
 
 
-			// Logger::Log("ÉãÏñ»úÎ»ÖÃ£º" + std::to_string(camera.x) + " " + std::to_string(camera.y));
+			// Logger::Log("æ‘„åƒæœºä½ç½®ï¼š" + std::to_string(camera.x) + " " + std::to_string(camera.y));
 		}
 	}
 };

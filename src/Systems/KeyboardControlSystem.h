@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef KEYBOARDCONTROLSYSTEM_H
 #define KEYBOARDCONTROLSYSTEM_H
 
@@ -23,7 +23,7 @@ public:
 	void OnKeyPressed(KeyPressedEvent& event) {
 		/*std::string keyCode = std::to_string(event.symbol);
 		std::string keySymbol(1, event.symbol);
-		Logger::Log("°´¼ü°´ÏÂ [" + keyCode + "] " + keySymbol);*/
+		Logger::Log("æŒ‰é”®æŒ‰ä¸‹ [" + keyCode + "] " + keySymbol);*/
 		for (auto entity : GetSystemEntities()) {
 			const auto keyboardcontrol = entity.GetComponent<KeyboardControlledComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();

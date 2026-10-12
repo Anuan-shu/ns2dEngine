@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef ECS_H
 #define ECS_H
 #include"../Logger/Logger.h"
@@ -11,7 +11,7 @@
 #include<set>
 #include<algorithm>
 const unsigned int MAX_COMPONENTS = 32;
-// ÓÃbitset±íÊ¾×é¼şÇ©Ãû£¬
+// ç”¨bitsetè¡¨ç¤ºç»„ä»¶ç­¾åï¼Œ
 typedef std::bitset<MAX_COMPONENTS> Signature;
 
 struct IComponent {
@@ -36,7 +36,7 @@ public:
 	int GetId() const;
 	void Kill();
 
-	// ±êÇ©ºÍ·Ö×é
+	// æ ‡ç­¾å’Œåˆ†ç»„
 	void Tag(const std::string& tag);
 	bool HasTag(const std::string& tag)const;
 	void Group(const std::string& group);
@@ -61,7 +61,7 @@ public:
 	template<typename TComponent> bool HasComponent()const;
 	template<typename TComponent> TComponent& GetComponent()const;
 
-	// ÊµÌåËùÊô×¢²á±í
+	// å®ä½“æ‰€å±æ³¨å†Œè¡¨
 	class Registry* registry;
 
 };
@@ -80,7 +80,7 @@ public:
 	std::vector<Entity> GetSystemEntities() const;
 	const Signature& GetComponentSignature()const;
 
-	// ÊµÌå±ØĞë¾ß±¸µÄ×é¼şÀàĞÍ£¬²ÅÄÜ±»ÏµÍ³Ê¶±ğ
+	// å®ä½“å¿…é¡»å…·å¤‡çš„ç»„ä»¶ç±»å‹ï¼Œæ‰èƒ½è¢«ç³»ç»Ÿè¯†åˆ«
 	template <typename TComponent> void RequireComponent();
 };
 
@@ -90,7 +90,7 @@ public:
 	virtual void RemoveEntityFromPool(int entityId) = 0;
 };
 
-// ×é¼ş³Ø
+// ç»„ä»¶æ± 
 template <typename T>
 class Pool :public IPool {
 private:
@@ -169,82 +169,82 @@ public:
 	}
 };
 
-// ×¢²á±í ¸ºÔğÊµÌå´´½¨Ïú»Ù£¬ÏµÍ³Ìí¼Ó¹ÜÀí
+// æ³¨å†Œè¡¨ è´Ÿè´£å®ä½“åˆ›å»ºé”€æ¯ï¼Œç³»ç»Ÿæ·»åŠ ç®¡ç†
 class Registry {
 private:
 	int numEntities = 0;
 
-	// ×é¼ş³ØÊı×é ´æ´¢ËùÓĞ×é¼ş³Ø
-	// componentPools[i]±íÊ¾×é¼şiµÄ×é¼ş³Ø
-	// Ã¿¸ö×é¼ş³ØÖĞpool[i]±íÊ¾ÊµÌåiµÄ×é¼ş
+	// ç»„ä»¶æ± æ•°ç»„ å­˜å‚¨æ‰€æœ‰ç»„ä»¶æ± 
+	// componentPools[i]è¡¨ç¤ºç»„ä»¶içš„ç»„ä»¶æ± 
+	// æ¯ä¸ªç»„ä»¶æ± ä¸­pool[i]è¡¨ç¤ºå®ä½“içš„ç»„ä»¶
 	std::vector<std::shared_ptr<IPool>>componentPools;
 
-	// ±êÃ÷Ã¿¸öÊµÌåÊ¹ÓÃÄÄĞ©×é¼ş£¬ÊµÌåid×÷ÎªË÷Òı
+	// æ ‡æ˜æ¯ä¸ªå®ä½“ä½¿ç”¨å“ªäº›ç»„ä»¶ï¼Œå®ä½“idä½œä¸ºç´¢å¼•
 	std::vector<Signature> entityComponentSignatures;
 
 	std::unordered_map<std::type_index, std::shared_ptr<System>>systems;
 
-	// Ö¡½áÊøÇ°Í³Ò»´´½¨Ïú»ÙÊµÌå
+	// å¸§ç»“æŸå‰ç»Ÿä¸€åˆ›å»ºé”€æ¯å®ä½“
 	std::set<Entity>entitiesToBeAdded;
 	std::set<Entity>entitiesToBeKilled;
 
-	// ÊµÌå±êÇ©
+	// å®ä½“æ ‡ç­¾
 	std::unordered_map<std::string, Entity>entityPerTag;
 	std::unordered_map<int, std::string>tagPerEntity;
 
-	// ÊµÌå·Ö×é
+	// å®ä½“åˆ†ç»„
 	std::unordered_map<std::string, std::set<Entity>>entitiesPerGroup;
 	std::unordered_map<int, std::string>groupPerEntity;
 
-	// ÒÑÏú»Ùidf¸´ÓÃ
+	// å·²é”€æ¯idfå¤ç”¨
 	std::deque<int> freeIds;
 
 public:
 	Registry() {
-		Logger::Log("Registry¹¹Ôì");
+		Logger::Log("Registryæ„é€ ");
 	}
 	~Registry() {
-		Logger::Log("RegistryÎö¹¹");
+		Logger::Log("Registryææ„");
 	}
 
 	void Update();
 
-	// ÊµÌå
+	// å®ä½“
 	Entity CreateEntity();
 	void KillEntity(Entity entity);
 	bool IsPendingRemoval(Entity entity) const { return entitiesToBeKilled.count(entity) != 0; }
 
-	// ±êÇ©
+	// æ ‡ç­¾
 	void TagEntity(Entity entity, const std::string& tag);
 	bool EntityHasTag(Entity entity, const std::string& tag)const;
 	Entity GetEntityByTag(const std::string& tag)const;
 	void RemoveEntityTag(Entity entity);
 
-	// ·Ö×é
+	// åˆ†ç»„
 	void GroupEntity(Entity entity, const std::string& group);
 	bool EntityBelongsToGroup(Entity entity, const std::string& group)const;
 	std::vector<Entity>GetEntitiesByGroup(const std::string& group)const;
 	void RemoveEntityGroup(Entity entity);
 
-	// ×é¼ş
+	// ç»„ä»¶
 	template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
 	template <typename TComponent> void RemoveComponent(Entity entity);
 	template <typename TComponent> bool HasComponent(Entity entity)const;
 	template<typename TComponent> TComponent& GetComponent(Entity entity)const;
 
-	// ÏµÍ³
+	// ç³»ç»Ÿ
 	template <typename TSystem, typename ...TArgs> void AddSystem(TArgs&& ...args);
 	template <typename TSystem> void RemoveSystem();
 	template <typename TSystem> bool HasSystem()const;
 	template <typename TSystem> TSystem& GetSystem()const;
 
-	// ¼ì²éÊµÌå×é¼şÇ©Ãû£¬¼ÓÈë/É¾³ı·ûºÏÏµÍ³ÒªÇóµÄÏµÍ³ÖĞ
+	// æ£€æŸ¥å®ä½“ç»„ä»¶ç­¾åï¼ŒåŠ å…¥/åˆ é™¤ç¬¦åˆç³»ç»Ÿè¦æ±‚çš„ç³»ç»Ÿä¸­
 	void AddEntityToSystems(Entity entity);
 	void RemoveEntityFromSystems(Entity entity);
 
 };
 
-// ÉèÖÃÏµÍ³ĞèÒªµÄ×é¼ş
+// è®¾ç½®ç³»ç»Ÿéœ€è¦çš„ç»„ä»¶
 template <typename TComponent>
 void System::RequireComponent() {
 	const auto componentId = Component<TComponent>::GetId();
@@ -300,10 +300,10 @@ void Registry::AddComponent(Entity entity, TArgs&&...args) {
 
 	componentPool->Set(entityId, newComponent);
 
-	// ÊµÌåµÄ×é¼şÇ©Ãû¶ÔÓ¦µÄ×é¼şÉèÎª1
+	// å®ä½“çš„ç»„ä»¶ç­¾åå¯¹åº”çš„ç»„ä»¶è®¾ä¸º1
 	entityComponentSignatures[entityId].set(componentId);
 
-	Logger::Log("ComponentId = " + std::to_string(componentId) + "Ìí¼Óµ½entityId = " + std::to_string(entityId));
+	Logger::Log("ComponentId = " + std::to_string(componentId) + "æ·»åŠ åˆ°entityId = " + std::to_string(entityId));
 }
 
 template <typename TComponent>
@@ -316,7 +316,7 @@ void Registry::RemoveComponent(Entity entity) {
 
 	entityComponentSignatures[entityId].set(componentId, false);
 
-	Logger::Log("ComponentId = " + std::to_string(componentId) + "´ÓentityId = " + std::to_string(entityId) + " ÖĞÒÆ³ı");
+	Logger::Log("ComponentId = " + std::to_string(componentId) + "ä»entityId = " + std::to_string(entityId) + " ä¸­ç§»é™¤");
 
 }
 
@@ -337,7 +337,7 @@ TComponent& Registry::GetComponent(Entity entity)const {
 
 //////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-// ÊµÌåÀà¹ÜÀí×é¼ş
+// å®ä½“ç±»ç®¡ç†ç»„ä»¶
 template <typename TComponent, typename ...TArgs>
 void Entity::AddComponent(TArgs&&...args) {
 	registry->AddComponent<TComponent>(*this, std::forward<TArgs>(args)...);

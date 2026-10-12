@@ -361,6 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-# Local CMake builds and verification dependencies
+# 本地 CMake 构建产物和验证所需的依赖
 .build/
 build/

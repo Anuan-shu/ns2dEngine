@@ -6,15 +6,15 @@ int main(int argc, char** argv) {
     Game game;
     game.Initialize();
     ImGui::GetIO().IniFilename = nullptr;
-    // Exercise the real loader, Lua callbacks, physics update and debug renderer.
+    // 验证真实关卡加载、Lua 回调、物理更新和调试绘制流程。
     game.Setup(argc > 1 ? std::atoi(argv[1]) : 3);
     for (int frame = 0; frame < 180; ++frame) {
         game.ProcessInput();
         game.Update();
         game.Render();
     }
-    // Fail on real initialization/loading/runtime errors; the legacy Game
-    // destructor itself logs with Err, so inspect before destruction.
+    // 初始化、加载或运行出现实际错误时，测试失败；原有 Game
+    // 析构函数本身使用 Err 记录日志，因此在析构前检查错误。
     for (const auto& message : Logger::messages) {
         if (message.type == LOG_ERROR) {
             std::cerr << "FAIL: " << message.message << '\n';

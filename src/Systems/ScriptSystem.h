@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef SCRIPTSYSTEM
 #define SCRIPTSYSTEM
 #include"../ECS/ECS.h"
@@ -12,7 +12,7 @@ std::tuple<double, double> GetEntityPosition(Entity entity) {
 		return std::make_tuple(transform.position.x, transform.position.y);
 	}
 	else {
-		Logger::Err("»ñÈ¡Î»ÖÃÊµÌåÎŞTransformComponent");
+		Logger::Err("è·å–ä½ç½®å®ä½“æ— TransformComponent");
 		return std::make_tuple(0.0, 0.0);
 	}
 }
@@ -23,7 +23,7 @@ std::tuple<double, double> GetEntityVelocity(Entity entity) {
 		return std::make_tuple(rigidbody.velocity.x, rigidbody.velocity.y);
 	}
 	else {
-		Logger::Err("»ñÈ¡ËÙ¶ÈÊµÌåÎŞRigidbodyComponent");
+		Logger::Err("è·å–é€Ÿåº¦å®ä½“æ— RigidbodyComponent");
 		return std::make_tuple(0.0, 0.0);
 	}
 }
@@ -35,7 +35,7 @@ void SetEntityVelocity(Entity entity, double x, double y) {
 		rigidbody.velocity.y = y;
 	}
 	else {
-		Logger::Err("ÉèÖÃËÙ¶ÈÊµÌåÎŞRigidbodyComponent");
+		Logger::Err("è®¾ç½®é€Ÿåº¦å®ä½“æ— RigidbodyComponent");
 	}
 }
 
@@ -45,7 +45,7 @@ void SetEntityRotation(Entity entity, double angle) {
 		transform.rotation = angle;
 	}
 	else {
-		Logger::Err("ÉèÖÃĞı×ªÊµÌåÎŞTransformComponent");
+		Logger::Err("è®¾ç½®æ—‹è½¬å®ä½“æ— TransformComponent");
 	}
 }
 
@@ -55,7 +55,7 @@ void SetEntityAnimationFrame(Entity entity, int frame) {
 		animation.currentFrame = frame;
 	}
 	else {
-		Logger::Err("ÉèÖÃ¶¯»­Ö¡ÊµÌåÎŞAnimationComponent");
+		Logger::Err("è®¾ç½®åŠ¨ç”»å¸§å®ä½“æ— AnimationComponent");
 	}
 }
 
@@ -66,7 +66,7 @@ void SetProjectileVelocity(Entity entity, double x, double y) {
 		projectileEmitter.projectileVelocity.y = y;
 	}
 	else {
-		Logger::Err("ÉèÖÃ·¢ÉäËÙ¶ÈÊµÌåÎŞProjectileEmitterComponent");
+		Logger::Err("è®¾ç½®å‘å°„é€Ÿåº¦å®ä½“æ— ProjectileEmitterComponent");
 	}
 }
 
@@ -77,7 +77,7 @@ void SetEntityPosition(Entity entity, double x, double y) {
 		transform.position.y = y;
 	}
 	else {
-		Logger::Err("ÉèÖÃÎ»ÖÃÊµÌåÎŞTransformComponent");
+		Logger::Err("è®¾ç½®ä½ç½®å®ä½“æ— TransformComponent");
 	}
 }
 

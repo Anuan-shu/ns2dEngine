@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef RENDER_H
 #define RENDER_H
 #include"../ECS/ECS.h"
@@ -10,13 +10,13 @@
 class RenderSystem :public System {
 public:
 	RenderSystem() {
-		// É¸Ñ¡ĞèÇóµÄ×é¼ş
+		// ç­›é€‰éœ€æ±‚çš„ç»„ä»¶
 		RequireComponent<TransformComponent>();
 		RequireComponent<SpriteComponent>();
 	}
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore, SDL_Rect& camera) {
-		// ÊµÌå°´zIndexÅÅĞò
+		// å®ä½“æŒ‰zIndexæ’åº
 		struct RenderableEntity {
 			TransformComponent transformComponent;
 			SpriteComponent spriteComponent;
@@ -51,10 +51,10 @@ public:
 			const auto& transform = entity.transformComponent;
 			const auto& sprite = entity.spriteComponent;
 
-			// ÉèÖÃÔ­Ê¼¾«ÁéÎÆÀíµÄÔ´¾ØĞÎ
+			// è®¾ç½®åŸå§‹ç²¾çµçº¹ç†çš„æºçŸ©å½¢
 			SDL_Rect srcRect = sprite.srcRect;
 
-			// ÉèÖÃÄ¿±ê¾ØĞÎ£¬È·¶¨¾«ÁéÔÚSDL´°¿ÚÏÔÊ¾Î»ÖÃ
+			// è®¾ç½®ç›®æ ‡çŸ©å½¢ï¼Œç¡®å®šç²¾çµåœ¨SDLçª—å£æ˜¾ç¤ºä½ç½®
 			SDL_Rect dstRect = {
 				static_cast<int>(transform.position.x - (sprite.isFixed ? 0 : camera.x)),
 				static_cast<int>(transform.position.y - (sprite.isFixed ? 0 : camera.y)),
@@ -62,7 +62,7 @@ public:
 				static_cast<int>(sprite.height * transform.scale.y)
 			};
 
-			// »æÖÆpngÎÆÀí
+			// ç»˜åˆ¶pngçº¹ç†
 			SDL_RenderCopyEx(
 				renderer,
 				assetStore->GetTexture(sprite.assetId),

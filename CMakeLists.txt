@@ -6,7 +6,7 @@ target_compile_features(physics_tests PRIVATE cxx_std_17)
 target_include_directories(physics_tests SYSTEM PRIVATE libs)
 add_test(NAME physics_tests COMMAND physics_tests)
 
-# Optional integration test with real SDL headers/library and the project's ECS.
+# 可选集成测试：使用真实 SDL 头文件、链接库和项目中的 ECS。
 set(SDL2_INCLUDE_DIR "" CACHE PATH "Directory containing SDL.h")
 set(SDL2_LIBRARY "" CACHE FILEPATH "SDL2 import library")
 if(SDL2_INCLUDE_DIR AND SDL2_LIBRARY)
@@ -34,7 +34,7 @@ if(NS2D_BUILD_GAME)
     target_compile_definitions(ns2d_game_core PUBLIC SDL_MAIN_HANDLED)
     target_include_directories(ns2d_game_core SYSTEM PUBLIC libs libs/lua "${SDL2_INCLUDE_DIR}"
         "${SDL2_IMAGE_ROOT}/include/SDL2" "${SDL2_TTF_ROOT}/include/SDL2")
-    # Bundled legacy sol has an unused template rejected by GCC 16's eager checking.
+    # 项目附带的旧版 sol 存在未使用的模板，GCC 16 的提前检查会将其判为错误。
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
         target_compile_options(ns2d_game_core PUBLIC -Wno-template-body)
     endif()

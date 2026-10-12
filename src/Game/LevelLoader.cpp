@@ -1,4 +1,4 @@
-#include"LevelLoader.h"
+ï»¿#include"LevelLoader.h"
 #include"Game.h"
 #include<fstream>
 #include<sol/sol.hpp>
@@ -37,7 +37,7 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 
 	sol::table level = lua["Level"];
 
-	// ¶ÁÈ¡×Ê²ú
+	// è¯»å–èµ„äº§
 	sol::table assets = level["assets"];
 	int i = 0;
 	while (true) {
@@ -50,11 +50,11 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 		std::string assetId = asset["id"];
 		if (assetType == "texture") {
 			assetStore->AddTexture(renderer, assetId, asset["file"]);
-			Logger::Log("¼ÓÔØĞÂÎÆÀí asset id: " + assetId);
+			Logger::Log("åŠ è½½æ–°çº¹ç† asset id: " + assetId);
 		}
 		if (assetType == "font") {
 			assetStore->AddFont(assetId, asset["file"], asset["font_size"]);
-			Logger::Log("¼ÓÔØĞÂ×ÖÌå asset id: " + assetId);
+			Logger::Log("åŠ è½½æ–°å­—ä½“ asset id: " + assetId);
 		}
 
 		i++;
@@ -64,7 +64,7 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 	std::string mapFilePath = map["map_file"];
 	std::string mapTextureAssetId = map["texture_asset_id"];
 
-	// ¼ÓÔØÍßÆ¬µØÍ¼
+	// åŠ è½½ç“¦ç‰‡åœ°å›¾
 	int tileSize = map["tile_size"];
 	double tileScale = map["scale"];
 	int mapNumCols = map["num_cols"];
@@ -193,7 +193,7 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 				);
 			}
 
-            // Generic collider supersedes the legacy boxcollider when provided.
+            // é…ç½®äº†é€šç”¨ç¢°æ’ä½“ collider æ—¶ï¼Œä¼˜å…ˆä½¿ç”¨å®ƒæ›¿ä»£æ—§çš„ boxcollider é…ç½®ã€‚
             sol::optional<sol::table> genericCollider = entity["components"]["collider"];
             if (genericCollider != sol::nullopt) {
                 sol::table config = genericCollider.value();

@@ -1,5 +1,5 @@
--- Launch with --physics-demo; D toggles collider outlines, Esc exits.
--- Reuse the existing map/assets, but replace the entities with a physics sandbox.
+-- 使用 --physics-demo 启动；按 D 切换碰撞体轮廓显示，按 Esc 退出。
+-- 复用现有地图和资源，将实体替换为物理演示场景。
 dofile("./assets/scripts/level1.lua")
 Level.entities = {
     [0] = { components = {

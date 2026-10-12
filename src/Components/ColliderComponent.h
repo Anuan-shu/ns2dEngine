@@ -4,11 +4,11 @@
 
 enum class ColliderShape { Box, Circle };
 
-// One collider per entity; dimensions/offset are unscaled local pixels.
+// 每个实体只有一个碰撞体；尺寸和偏移使用未经缩放的局部像素坐标。
 struct ColliderComponent {
     ColliderShape shape = ColliderShape::Box;
     float width = 0, height = 0, radius = 0;
-    glm::vec2 offset{0}; // Top-left of local bounding rectangle, also for circles.
+    glm::vec2 offset{0}; // 局部包围矩形的左上角偏移；圆形也遵循此约定。
     bool isTrigger = false;
     std::uint32_t category = 1;
     std::uint32_t mask = 0xffffffffu;

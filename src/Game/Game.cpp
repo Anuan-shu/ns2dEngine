@@ -15,6 +15,9 @@
 #include"../Systems/RenderTextSystem.h"
 #include"../Systems/RenderHealthBarSystem.h"
 #include"../Systems/RenderGUISystem.h"
+#include"../Systems/RenderPrimitiveSystem.h"
+#include"../Editor/SceneEditor.h"
+#include"../Time/SimulationClock.h"
 #include"../Systems/ScriptSystem.h"
 #include<SDL.h>
 #include<SDL_image.h>
@@ -77,7 +80,10 @@ void Game::Initialize() {
 
 	// imgui初始化
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(renderer, windowWidth, windowHeight);
+	    // 在建立字体纹理之前配置中文字体和编辑器样式。
+    RenderGUISystem::ConfigureUI();
+    ImGui_ImplSDL2_InitForOpenGL(window, nullptr); // 此旧版接口只初始化 SDL 输入，不创建图形上下文。
+    ImGuiSDL::Initialize(renderer, windowWidth, windowHeight);
 
 	// 全屏模式
 	// SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
@@ -91,44 +97,40 @@ void Game::Initialize() {
 	isRunning = true;
 }
 void Game::ProcessInput() {
-	SDL_Event sdlEvent;
-	while (SDL_PollEvent(&sdlEvent)) {
-		// imgui 输入
-		ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
-		ImGuiIO& io = ImGui::GetIO();
-
-		int mouseX, mouseY;
-		const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
-
-		io.MousePos = ImVec2(mouseX, mouseY);
-		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
-		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-
-
-		switch (sdlEvent.type) {
-		case SDL_QUIT:
-			isRunning = false;
-			break;
-		case SDL_KEYDOWN:
-			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
-				isRunning = false;
-			}
-			if (sdlEvent.key.keysym.sym == SDLK_d) {
-				isDebug = !isDebug;
-				Logger::Log("isDebug = " + std::to_string(isDebug));
-			}
-			eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
-			break;
-		}
-	}
-
+    auto deferred = registry->Defer();
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+        auto& io = ImGui::GetIO();
+        if (event.type == SDL_QUIT) { isRunning = false; continue; }
+        if (event.type != SDL_KEYDOWN) continue;
+        const auto key = event.key.keysym.sym;
+        if (key == SDLK_ESCAPE && !io.WantTextInput) { isRunning = false; continue; }
+        if (editor && isDebug && !event.key.repeat && (event.key.keysym.mod & KMOD_CTRL) && key == SDLK_s) {
+            editor->SetPaused(true);
+            registry->GetSystem<RenderGUISystem>().SaveFromShortcut(*editor); continue;
+        }
+        if (editor && !io.WantTextInput && !event.key.repeat) {
+            if (key == SDLK_F2 || (key == SDLK_d && !io.WantCaptureKeyboard && !io.KeyCtrl)) {
+                isDebug = !isDebug;
+                editor->SetPaused(isDebug);
+                continue;
+            }
+            if (isDebug && key == SDLK_F5) { editor->SetPaused(!editor->IsPaused()); continue; }
+            if (isDebug && key == SDLK_F6) { editor->RequestStep(); continue; }
+        }
+        // 编辑器输入和暂停期间的按键不能同时控制玩家或发射子弹。
+        if (!io.WantCaptureKeyboard && editor && !editor->IsPaused()) eventBus->EmitEvent<KeyPressedEvent>(key);
+    }
 }
 
-void Game::Setup(int level) {
-	isDebug = level == 3;
+void Game::Setup(int level, bool editorMode) {
+	isDebug = editorMode || level == 3;
+    SimulationClock::Set(0);
 	// 给游戏添加系统
 	registry->AddSystem<MovementSystem>();
 	registry->AddSystem<RenderSystem>();
+    registry->AddSystem<RenderPrimitiveSystem>();
 	registry->AddSystem<AnimationSystem>();
 	registry->AddSystem<CollisionSystem>();
 	registry->AddSystem<RenderColliderSystem>();
@@ -151,7 +153,36 @@ void Game::Setup(int level) {
 	registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
 	registry->GetSystem<KeyboardControlSystem>().SubscribeToEvents(eventBus);
 	registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventBus);
-	registry->Update();
+    registry->Update();
+    editor = std::make_unique<SceneEditor>(*registry, *assetStore, lua, level);
+    editor->SetPaused(editorMode);
+    if (editorMode && !editor->Entities().empty()) editor->Select(editor->Entities().front());
+    millisecsPreviousFrame = SDL_GetTicks();
+}
+SceneEditor& Game::GetEditor() { return *editor; }
+bool Game::CaptureScreenshot(const std::string& path) {
+    int width = 0, height = 0;
+    if (SDL_GetRendererOutputSize(renderer, &width, &height) != 0) return false;
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    if (!surface) return false;
+    const bool success = SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888, surface->pixels, surface->pitch) == 0
+        && SDL_SaveBMP(surface, path.c_str()) == 0;
+    SDL_FreeSurface(surface);
+    return success;
+}
+void Game::SimulateStep(float step) {
+    SimulationClock::Advance(step);
+    {
+        auto deferred = registry->Defer();
+        registry->GetSystem<ScriptSystem>().Update(step, static_cast<int>(SimulationClock::Milliseconds()));
+        registry->GetSystem<MovementSystem>().Update(step);
+        registry->GetSystem<CollisionSystem>().Update(eventBus);
+        registry->GetSystem<AnimationSystem>().Update();
+        registry->GetSystem<ProjectileEmitSystem>().Update(registry);
+        registry->GetSystem<ProjectileLifecycleSystem>().Update();
+    }
+    registry->Update();
+    editor->dirty = true;
 }
 void Game::Update() {
 	// 固定帧率上限
@@ -168,39 +199,38 @@ void Game::Update() {
 	// 执行固定物理步之前，先提交实体的创建与销毁。
 	registry->Update();
 
-	// 更新系统
-	physicsClock.Advance(deltaTime, [&](float step) {
-		registry->GetSystem<ScriptSystem>().Update(step, SDL_GetTicks());
-		registry->GetSystem<MovementSystem>().Update(step);
-		registry->GetSystem<CollisionSystem>().Update(eventBus);
-		registry->Update();
-	});
-	registry->GetSystem<AnimationSystem>().Update();
-	registry->GetSystem<ProjectileEmitSystem>().Update(registry);
-	registry->GetSystem<CameraMoventSystem>().Update(camera);
-	registry->GetSystem<ProjectileLifecycleSystem>().Update();
+    editor->ApplyRequests();
+    if (editor->IsPaused()) {
+        physicsClock = Physics2D::FixedStepClock{};
+        if (editor->ConsumeStep()) SimulateStep(static_cast<float>(Physics2D::FixedStepClock::Step));
+    } else physicsClock.Advance(deltaTime, [&](float step) { SimulateStep(step); });
+    if (!isDebug) registry->GetSystem<CameraMoventSystem>().Update(camera);
+    camera.x = (std::max)(0, (std::min)(camera.x, (std::max)(0, mapWidth - camera.w)));
+    camera.y = (std::max)(0, (std::min)(camera.y, (std::max)(0, mapHeight - camera.h)));
 
 }
 void Game::Render() {
-	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
-	SDL_RenderClear(renderer);
-
-	// TODO: 渲染逻辑
-	registry->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
-	registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
-	registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
-	if (isDebug) {
-		registry->GetSystem<RenderColliderSystem>().Update(renderer, camera);
-
-		registry->GetSystem<RenderGUISystem>().Update(registry, camera);
-	}
-
-
-	// 前后缓冲区交换
-	SDL_RenderPresent(renderer);
+    auto deferred = registry->Defer();
+    SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
+    SDL_RenderClear(renderer);
+    registry->GetSystem<RenderSystem>().Update(renderer, assetStore, camera);
+    registry->GetSystem<RenderPrimitiveSystem>().Update(renderer, camera);
+    registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
+    registry->GetSystem<RenderHealthBarSystem>().Update(renderer, assetStore, camera);
+    ImGui_ImplSDL2_NewFrame(window);
+    ImGui::GetIO().DisplayFramebufferScale = ImVec2(1, 1);
+    ImGui::NewFrame();
+    if (isDebug) {
+        if (editor->showColliders) registry->GetSystem<RenderColliderSystem>().Update(renderer, camera);
+        registry->GetSystem<RenderGUISystem>().Update(*editor, *registry, *assetStore, camera);
+    }
+    ImGui::Render();
+    if (isDebug) ImGuiSDL::Render(ImGui::GetDrawData());
+    SDL_RenderPresent(renderer);
 }
-void Game::Run(int level) {
-	Setup(level);
+
+void Game::Run(int level, bool editorMode) {
+	Setup(level, editorMode);
 	millisecsPreviousFrame = SDL_GetTicks();
 	while (isRunning) {
 		ProcessInput();
@@ -210,6 +240,8 @@ void Game::Run(int level) {
 }
 
 void Game::Destroy() {
+    assetStore->ClearAssets();
+    ImGui_ImplSDL2_Shutdown();
 	ImGuiSDL::Deinitialize();
 	ImGui::DestroyContext();
 	SDL_DestroyRenderer(renderer);

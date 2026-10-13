@@ -13,6 +13,8 @@
 #include"../Components/HealthComponent.h"
 #include"../Components/TextLabelComponent.h"
 #include"../Components/ScriptComponent.h"
+#include"../Components/SceneObjectComponent.h"
+#include"../Components/PrimitiveRenderComponent.h"
 
 LevelLoader::LevelLoader() {
 
@@ -76,9 +78,9 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 		for (int x = 0; x < mapNumCols; x++) {
 			char ch;
 			mapFile.get(ch);
-			int srcRectY = std::atoi(&ch) * tileSize;
+			int srcRectY = (ch >= '0' && ch <= '9' ? ch - '0' : 0) * tileSize;
 			mapFile.get(ch);
-			int srcRectX = std::atoi(&ch) * tileSize;
+			int srcRectX = (ch >= '0' && ch <= '9' ? ch - '0' : 0) * tileSize;
 			mapFile.ignore();
 
 			Entity tile = registry->CreateEntity();
@@ -101,6 +103,7 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 
 		sol::table entity = entities[i];
 		Entity newEntity = registry->CreateEntity();
+        newEntity.AddComponent<SceneObjectComponent>("关卡对象 " + std::to_string(i), i);
 
 		// Tag
 		sol::optional<std::string>tag = entity["tag"];
@@ -276,6 +279,18 @@ void LevelLoader::LoadLevel(sol::state& lua, const std::unique_ptr<Registry>& re
 				newEntity.AddComponent<ScriptComponent>(func);
 			}
 		}
+
+        if (newEntity.HasComponent<ColliderComponent>() && !newEntity.HasComponent<SpriteComponent>())
+            newEntity.AddComponent<PrimitiveRenderComponent>();
+        auto& sceneObject = newEntity.GetComponent<SceneObjectComponent>();
+        sol::optional<std::string> objectName = entity["name"];
+        if (objectName) sceneObject.name = objectName.value();
+        else if (newEntity.HasComponent<SpriteComponent>())
+            sceneObject.name = newEntity.GetComponent<SpriteComponent>().assetId + " " + std::to_string(i);
+        else if (newEntity.HasComponent<ColliderComponent>())
+            sceneObject.name = newEntity.GetComponent<ColliderComponent>().shape == ColliderShape::Circle
+                ? "圆形 " + std::to_string(i) : "矩形 " + std::to_string(i);
+        if (tag && !objectName) sceneObject.name = tag.value();
 
 		i++;
 	}

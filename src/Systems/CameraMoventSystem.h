@@ -28,8 +28,8 @@ public:
 			camera.x = camera.x < 0 ? 0 : camera.x;
 			camera.y = camera.y < 0 ? 0 : camera.y;
 
-			camera.x = camera.x > camera.w ? camera.w : camera.x;
-			camera.y = camera.y > camera.h ? camera.h : camera.y;
+			camera.x = (std::max)(0, (std::min)(camera.x, Game::mapWidth - camera.w));
+			camera.y = (std::max)(0, (std::min)(camera.y, Game::mapHeight - camera.h));
 
 
 			// Logger::Log("摄像机位置：" + std::to_string(camera.x) + " " + std::to_string(camera.y));

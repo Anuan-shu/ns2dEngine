@@ -1,4 +1,5 @@
 #pragma once
+#include"../Time/SimulationClock.h"
 #ifndef PROJECTILELIFECYCLESYSTEM_H
 #define PROJECTILELIFECYCLESYSTEM_H
 #include"../ECS/ECS.h"
@@ -13,7 +14,7 @@ public:
 		for (auto entity : GetSystemEntities()) {
 			auto projectile = entity.GetComponent<ProjectileComponent>();
 
-			if (SDL_GetTicks() - projectile.startTime > projectile.duration) {
+			if (SimulationClock::Milliseconds() - projectile.startTime > projectile.duration) {
 				entity.Kill();
 			}
 		}

@@ -12,7 +12,7 @@ public:
         RequireComponent<ColliderComponent>();
     }
     void Update(std::unique_ptr<EventBus>& eventBus) {
-        auto entities = GetSystemEntities();
+        const auto& entities = GetSystemEntities();
         std::vector<Physics2D::WorldShape> shapes;
         for (auto entity : entities) {
             shapes.push_back(entity.registry->IsPendingRemoval(entity) ? Physics2D::WorldShape{} : Physics2D::ShapeOf(entity));

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -131,6 +131,12 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="libs\glm\common.hpp" />
@@ -393,6 +399,13 @@
     <ClInclude Include="src\Components\ColliderComponent.h" />
     <ClInclude Include="src\Physics\Physics2D.h" />
     <ClInclude Include="src\Physics\EntityShape.h" />
+    <ClInclude Include="src\Components\SceneObjectComponent.h" />
+    <ClInclude Include="src\Components\PrimitiveRenderComponent.h" />
+    <ClInclude Include="src\Time\SimulationClock.h" />
+    <ClInclude Include="src\Editor\SceneData.h" />
+    <ClInclude Include="src\Editor\SceneSerializer.h" />
+    <ClInclude Include="src\Editor\SceneEditor.h" />
+    <ClInclude Include="src\Systems\RenderPrimitiveSystem.h" />
     <ClInclude Include="src\Components\BoxColliderComponent.h" />
     <ClInclude Include="src\Components\CameraFollowComponent.h" />
     <ClInclude Include="src\Components\HealthComponent.h" />
@@ -579,6 +592,9 @@
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\AssetStore\AssetStore.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
+    <ClCompile Include="src\Editor\SceneEditor.cpp" />
+    <ClCompile Include="src\Editor\SceneSerializer.cpp" />
+    <ClCompile Include="src\Systems\RenderGUISystem.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
     <ClCompile Include="src\Game\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />

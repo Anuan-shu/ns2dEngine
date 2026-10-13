@@ -44,3 +44,13 @@ void AssetStore::AddFont(const std::string& assetId, const std::string& filePath
 TTF_Font* AssetStore::GetFont(const std::string& assetId) {
 	return fonts[assetId];
 }
+std::vector<std::string> AssetStore::GetTextureIds() const {
+    std::vector<std::string> result;
+    for (const auto& item : textures) if (item.second) result.push_back(item.first);
+    return result;
+}
+std::vector<std::string> AssetStore::GetFontIds() const {
+    std::vector<std::string> result;
+    for (const auto& item : fonts) if (item.second) result.push_back(item.first);
+    return result;
+}

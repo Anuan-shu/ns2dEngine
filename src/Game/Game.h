@@ -12,12 +12,13 @@
 const int FPS = 60;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
 
+class SceneEditor;
 class Game {
 private:
 	bool isRunning;
 	bool isDebug;
-	SDL_Window* window;
-	SDL_Renderer* renderer;
+	SDL_Window* window = nullptr;
+	SDL_Renderer* renderer = nullptr;
 	Uint32 millisecsPreviousFrame = 0;
 	Physics2D::FixedStepClock physicsClock;
 	SDL_Rect camera;
@@ -26,13 +27,17 @@ private:
 	std::unique_ptr<Registry> registry;
 	std::unique_ptr<AssetStore>assetStore;
 	std::unique_ptr<EventBus>eventBus;
+    std::unique_ptr<SceneEditor> editor;
+    void SimulateStep(float step);
 
 public:
 	Game();
 	~Game();
 	void Initialize();
-	void Run(int level = 2);
-	void Setup(int level = 2);
+	void Run(int level = 2, bool editorMode = false);
+	void Setup(int level = 2, bool editorMode = false);
+    SceneEditor& GetEditor();
+    bool CaptureScreenshot(const std::string& path);
 	void ProcessInput();
 	void Update();
 	void Render();

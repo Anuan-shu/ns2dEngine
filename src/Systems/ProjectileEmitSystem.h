@@ -13,6 +13,7 @@
 #include"../Components/ProjectileComponent.h"
 #include"../Components/CameraFollowComponent.h"
 #include<SDL.h>
+#include"../Time/SimulationClock.h"
 
 class ProjectileEmitSystem :public System {
 public:
@@ -28,7 +29,8 @@ public:
 	void OnKeyPressed(KeyPressedEvent& event) {
 		if (event.symbol == SDLK_SPACE) {
 			for (auto entity : GetSystemEntities()) {
-				if (entity.HasComponent<CameraFollowComponent>()) {
+            if (entity.IsPendingRemoval()) continue;
+				if (entity.HasComponent<CameraFollowComponent>() && entity.HasComponent<RigidBodyComponent>()) {
 					const auto projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 					const auto transform = entity.GetComponent<TransformComponent>();
 					const auto rigidbody = entity.GetComponent<RigidBodyComponent>();
@@ -55,8 +57,10 @@ public:
 					projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
 					projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
 					projectile.AddComponent<SpriteComponent>("bullet-texture", 4, 4, 4);
-					projectile.AddComponent<BoxColliderComponent>(4, 4);
-				projectile.GetComponent<BoxColliderComponent>().isTrigger = true;
+					// 提交前不能查询新组件，先在局部配置好触发器再加入命令队列。
+                BoxColliderComponent collider(4, 4);
+                collider.isTrigger = true;
+                projectile.AddComponent<BoxColliderComponent>(collider);
 					projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 
 				}
@@ -66,6 +70,7 @@ public:
 
 	void Update(std::unique_ptr<Registry>& registry) {
 		for (auto entity : GetSystemEntities()) {
+            if (entity.IsPendingRemoval()) continue;
 			auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 			const auto transform = entity.GetComponent<TransformComponent>();
 
@@ -73,7 +78,7 @@ public:
 				continue;
 			}
 
-			if (SDL_GetTicks() - projectileEmitter.lastEmissionTime > projectileEmitter.repeatFrequency) {
+			if (SimulationClock::Milliseconds() - projectileEmitter.lastEmissionTime > projectileEmitter.repeatFrequency) {
 				glm::vec2 projectilePosition = transform.position;
 				if (entity.HasComponent<SpriteComponent>()) {
 					const auto sprite = entity.GetComponent<SpriteComponent>();
@@ -86,11 +91,13 @@ public:
 				projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
 				projectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
 				projectile.AddComponent<SpriteComponent>("bullet-texture", 4, 4, 4);
-				projectile.AddComponent<BoxColliderComponent>(4, 4);
-				projectile.GetComponent<BoxColliderComponent>().isTrigger = true;
+				// 提交前不能查询新组件，先在局部配置好触发器再加入命令队列。
+                BoxColliderComponent collider(4, 4);
+                collider.isTrigger = true;
+                projectile.AddComponent<BoxColliderComponent>(collider);
 				projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 
-				projectileEmitter.lastEmissionTime = SDL_GetTicks();
+				projectileEmitter.lastEmissionTime = SimulationClock::Milliseconds();
 
 			}
 		}

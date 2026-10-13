@@ -3,6 +3,7 @@
 #define ANIMATIONSYSTEM
 
 #include<SDL.h>
+#include"../Time/SimulationClock.h"
 #include"../ECS/ECS.h"
 #include"../Components/AnimationComponent.h"
 #include"../Components/SpriteComponent.h"
@@ -20,7 +21,8 @@ public:
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 
 
-			animation.currentFrame = static_cast<int>((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000.0) % animation.numFrames;
+			const int frame = static_cast<int>((SimulationClock::Milliseconds() - animation.startTime) * animation.frameSpeedRate / 1000.0);
+            animation.currentFrame = animation.isLoop ? frame % animation.numFrames : (std::min)(frame, animation.numFrames - 1);
 			sprite.srcRect.x = animation.currentFrame * sprite.width;
 		}
 	}

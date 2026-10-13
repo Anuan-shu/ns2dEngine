@@ -41,9 +41,10 @@ public:
 
 	}
 	void onProjectileHitsEnemy(Entity projectile, Entity enemy) {
+		if (!projectile.HasComponent<ProjectileComponent>()) return;
 		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
 
-		if (projectileComponent.isFriendly) {
+		if (projectileComponent.isFriendly && enemy.HasComponent<HealthComponent>()) {
 			auto& healeh = enemy.GetComponent<HealthComponent>();
 			healeh.healthPercentage -= projectileComponent.hitPercentDamage;
 
@@ -55,9 +56,10 @@ public:
 		}
 	}
 	void onProjectileHitsPlayer(Entity projectile, Entity player) {
+		if (!projectile.HasComponent<ProjectileComponent>()) return;
 		auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
 
-		if (!projectileComponent.isFriendly) {
+		if (!projectileComponent.isFriendly && player.HasComponent<HealthComponent>()) {
 			auto& healeh = player.GetComponent<HealthComponent>();
 			healeh.healthPercentage -= projectileComponent.hitPercentDamage;
 

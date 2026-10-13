@@ -3,6 +3,7 @@
 #define ANIMATIONCOMPONENT_H
 
 #include<SDL.h>
+#include"../Time/SimulationClock.h"
 struct AnimationComponent {
 	int numFrames;
 	int currentFrame;
@@ -12,10 +13,10 @@ struct AnimationComponent {
 
 	AnimationComponent(int numFrames = 1, int frameSpeedRate = 1, bool isLoop = true) {
 		this->numFrames = numFrames;
-		this->currentFrame = 1;
+		this->currentFrame = 0;
 		this->frameSpeedRate = frameSpeedRate;
 		this->isLoop = isLoop;
-		this->startTime = SDL_GetTicks();
+		this->startTime = SimulationClock::Milliseconds();
 	}
 };
 

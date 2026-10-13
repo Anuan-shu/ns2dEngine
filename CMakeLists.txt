@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 project(ns2d_physics_tests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
+add_executable(ecs_tests tests/ecs_tests.cpp src/ECS/ECS.cpp)
+target_compile_features(ecs_tests PRIVATE cxx_std_17)
+target_include_directories(ecs_tests SYSTEM PRIVATE libs)
+add_test(NAME ecs_tests COMMAND ecs_tests)
 add_executable(physics_tests tests/physics_tests.cpp)
 target_compile_features(physics_tests PRIVATE cxx_std_17)
 target_include_directories(physics_tests SYSTEM PRIVATE libs)
@@ -28,6 +34,7 @@ if(NS2D_BUILD_GAME)
     add_library(ns2d_game_core STATIC
         src/Game/Game.cpp src/Game/LevelLoader.cpp src/ECS/ECS.cpp
         src/Logger/Logger.cpp src/AssetStore/AssetStore.cpp
+        src/Editor/SceneEditor.cpp src/Editor/SceneSerializer.cpp src/Systems/RenderGUISystem.cpp
         libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_widgets.cpp
         libs/imgui/imgui_sdl.cpp libs/imgui/imgui_impl_sdl.cpp)
     target_compile_features(ns2d_game_core PUBLIC cxx_std_17)
@@ -45,9 +52,26 @@ if(NS2D_BUILD_GAME)
     target_link_libraries(ns2dEngine PRIVATE ns2d_game_core)
     add_executable(physics_game_smoke tests/physics_game_smoke.cpp)
     target_link_libraries(physics_game_smoke PRIVATE ns2d_game_core)
+    add_executable(scene_editor_tests tests/scene_editor_tests.cpp)
+    target_link_libraries(scene_editor_tests PRIVATE ns2d_game_core)
+    add_test(NAME scene_editor_tests COMMAND scene_editor_tests)
+    set_tests_properties(scene_editor_tests PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" TIMEOUT 30)
+    add_executable(scene_editor_game_tests tests/scene_editor_game_tests.cpp)
+    target_link_libraries(scene_editor_game_tests PRIVATE ns2d_game_core)
+    add_executable(scene_editor_ui_tests tests/scene_editor_ui_tests.cpp)
+    target_link_libraries(scene_editor_ui_tests PRIVATE ns2d_game_core)
+    add_test(NAME scene_editor_ui_tests COMMAND scene_editor_ui_tests)
+    set_tests_properties(scene_editor_ui_tests PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy" TIMEOUT 30)
     foreach(level 2 3)
         add_test(NAME game_level_${level}_smoke COMMAND physics_game_smoke ${level})
         set_tests_properties(game_level_${level}_smoke PROPERTIES
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy" TIMEOUT 30)
+    endforeach()
+    foreach(level 2 3)
+        add_test(NAME editor_level_${level}_integration COMMAND scene_editor_game_tests ${level})
+        set_tests_properties(editor_level_${level}_integration PROPERTIES
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
             ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy" TIMEOUT 30)
     endforeach()

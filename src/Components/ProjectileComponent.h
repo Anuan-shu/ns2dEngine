@@ -3,6 +3,7 @@
 #define PROJECTILECOMPONENT
 
 #include<SDL.h>
+#include"../Time/SimulationClock.h"
 
 struct ProjectileComponent {
 	bool isFriendly;
@@ -14,7 +15,7 @@ struct ProjectileComponent {
 		this->isFriendly = isFriendly;
 		this->hitPercentDamage = hitPercentDamage;
 		this->duration = duration;
-		this->startTime = SDL_GetTicks();
+		this->startTime = SimulationClock::Milliseconds();
 	}
 };
 #endif // !PROJECTILECOMPONENT

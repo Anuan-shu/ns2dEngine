@@ -91,6 +91,8 @@ public:
 		lua.new_usertype<Entity>(
 			"entity",
 			"get_id", &Entity::GetId,
+            "is_valid", &Entity::IsValid,
+            "get_generation", &Entity::GetGeneration,
 			"destroy", &Entity::Kill,
 			"has_tag", &Entity::HasTag,
 			"belongs_to_group", &Entity::BelongsToGroup
@@ -115,7 +117,7 @@ public:
 		for (auto entity : GetSystemEntities()) {
 			if (entity.registry->IsPendingRemoval(entity)) continue;
 			const auto script = entity.GetComponent<ScriptComponent>();
-			script.func(entity, deltaTime, ellapsedTime);
+			if (script.enabled) script.func(entity, deltaTime, ellapsedTime);
 		}
 	}
 };
